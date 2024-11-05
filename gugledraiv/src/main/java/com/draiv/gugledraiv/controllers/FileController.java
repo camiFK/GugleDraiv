@@ -4,18 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.services.*;
-import java.util.List;
+
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/files")
 public class FileController {
 
     @Autowired
     private FileService fileService;
 
-    @GetMapping
-    public List<File> getAllFiles() {
-        return fileService.getAllFiles();
+    @GetMapping("/{userId}")
+    public Optional<File> getAllFiles(@PathVariable("userId") Long userId) {
+        return fileService.getAllFilesByUserId(userId);
     }
 
     @PostMapping
