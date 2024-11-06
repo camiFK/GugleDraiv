@@ -9,10 +9,12 @@ import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.services.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.*;
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
 
     @Autowired
