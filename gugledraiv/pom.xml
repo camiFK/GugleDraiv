@@ -84,7 +84,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-                			<mainClass>com.draiv.gugledraiv.controllers.FileController</mainClass> 
+                			<mainClass>com.draiv.gugledraiv.GugledraivApplication</mainClass> 
             			</configuration>
 			</plugin>
 		</plugins>
