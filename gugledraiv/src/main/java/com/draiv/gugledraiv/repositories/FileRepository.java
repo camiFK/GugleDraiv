@@ -9,5 +9,5 @@ import com.draiv.gugledraiv.entities.*;
 
 @Repository
 public interface FileRepository extends JpaRepository<File, Long> {
-
+    // List<File> findByUserId(Long userId);
 }

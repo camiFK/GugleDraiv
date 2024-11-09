@@ -1,28 +1,35 @@
 package com.draiv.gugledraiv.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.services.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.Optional;
-
+import java.util.*;
 @RestController
-@RequestMapping("/files")
+@CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
 
     @Autowired
     private FileService fileService;
 
-    @GetMapping("/{userId}")
-    public Optional<File> getAllFiles(@PathVariable("userId") Long userId) {
-        return fileService.getAllFilesByUserId(userId);
+    @GetMapping({"/files", "/"})
+    public List<File> getAllFiles() {
+        return fileService.GetAllFiles();
     }
 
-    @PostMapping
-    public File uploadFile(@RequestBody File file) {
-        return fileService.saveFile(file);
+    @GetMapping("/files/{id}")
+    public File GetFileById(@PathVariable Long id) {
+        return fileService.GetFileById(id);
     }
+    
 
     // Agregar endpoints
 }
