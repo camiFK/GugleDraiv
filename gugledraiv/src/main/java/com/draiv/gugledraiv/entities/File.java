@@ -85,4 +85,29 @@ public class File {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    public void setSystemId(String systemId2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setSystemId'");
+    }
+
+    public void setIsFolder(boolean isFolder2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setIsFolder'");
+    }
+
+    public void setMimeType(String mimeType2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setMimeType'");
+    }
+
+    public void setContent(String content2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setContent'");
+    }
+
+    public void setIsPublic(boolean isPublic2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setIsPublic'");
+    }
 }
