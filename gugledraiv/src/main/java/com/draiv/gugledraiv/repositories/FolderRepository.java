@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
 
+<<<<<<< HEAD
     // List<File> findByFolderIsNullAndFolderUserId(String userId);   
     @Query(value = "WITH RECURSIVE carpetas_jerarquia AS (" +
                    "  SELECT id, nombre, carpeta_padre_id FROM carpeta WHERE carpeta_padre_id IS NULL " +
@@ -35,3 +36,6 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     
     // Optional<Folder> findByUserIdAndPath(String userId, String path);
 
+=======
+}
+>>>>>>> f8a2a241963d12607019e27bf212e78abd11c409
