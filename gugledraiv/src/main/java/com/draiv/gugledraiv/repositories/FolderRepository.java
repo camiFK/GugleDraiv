@@ -14,28 +14,12 @@ import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
 
-<<<<<<< HEAD
-    // List<File> findByFolderIsNullAndFolderUserId(String userId);   
-    @Query(value = "WITH RECURSIVE carpetas_jerarquia AS (" +
-                   "  SELECT id, nombre, carpeta_padre_id FROM carpeta WHERE carpeta_padre_id IS NULL " +
-                   "  UNION ALL " +
-                   "  SELECT c.id, c.nombre, c.carpeta_padre_id FROM carpeta c " +
-                   "  INNER JOIN carpetas_jerarquia cj ON c.carpeta_padre_id = cj.id" +
-                   ") " +
-                   "SELECT * FROM carpetas_jerarquia", nativeQuery = true)
-    List<Folder> findCarpetasJerarquia();
-    
-    @Query("SELECT d FROM Documento d WHERE d.carpeta.id = :carpetaId")
-    List<File> findDocumentosByFolderId(@Param("carpetaId") Long carpetaId);
-}
-    // List<File> findByFolder(Folder folder);
+    // Buscar archivos fuera carpetas pertenecientes a un usuario específico (userId);   
+    @Query(value = "SELECT * FROM file f WHERE f.folder_id IS NULL AND f.user_id = :userId", nativeQuery = true)
+    List<File> findByFolderIsNullAndFolderUserId(@Param("userId") Long userId);
 
-    //@Query("""
-            
-            //""";)
-    
-    // Optional<Folder> findByUserIdAndPath(String userId, String path);
-
-=======
+    // Buscar carpeta por userId y ruta;
+    @Query(value = "SELECT f FROM Folder f WHERE f.user.userId = :userId AND f.path = :path")
+    Optional<Folder> findByUserIdAndPath(@Param("userId") String userId, @Param("path") String path);
 }
->>>>>>> f8a2a241963d12607019e27bf212e78abd11c409
+

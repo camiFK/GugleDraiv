@@ -3,15 +3,15 @@ package com.draiv.gugledraiv.repositories;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.draiv.gugledraiv.entities.*;
 
 @Repository
 public interface FileRepository extends JpaRepository<File, Long> {
-<<<<<<< HEAD
-    
-=======
-    // List<File> findByUserId(Long userId);
->>>>>>> f8a2a241963d12607019e27bf212e78abd11c409
+    // Buscar archivos desde una carpeta específica;
+     @Query("SELECT f FROM File f WHERE f.folder = :folder")
+    List<File> findByFolder(@Param("folder") Folder folder);
 }
