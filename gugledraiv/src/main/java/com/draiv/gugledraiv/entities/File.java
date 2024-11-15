@@ -86,6 +86,9 @@ public class File {
         this.filePath = filePath;
     }
 
+    public String getSystemId() {
+        return systemId;
+    }
     public void setSystemId(String systemId2) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setSystemId'");

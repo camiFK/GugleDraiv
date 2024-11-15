@@ -3,12 +3,8 @@ package com.draiv.gugledraiv.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.Resource;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.services.*;
@@ -16,8 +12,6 @@ import com.google.common.io.Resources;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
@@ -25,7 +19,6 @@ import java.util.*;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
-
     @Autowired
     private FileService fileService;
 
@@ -81,8 +74,42 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
-   
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<Map<String, String>> deleteFileOrFolder(
+            @PathVariable String fileId,
+            @RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("token");
+            String systemId = request.get("systemId");
+
+            // Verificación de autenticación (opcional, según tu lógica)
+            if (!fileService.isAuthenticated(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "message", "No autenticado."
+                ));
+            }
+
+            // Llamada al servicio para eliminar el archivo o carpeta
+            boolean deleted = fileService.deleteFileOrFolder(fileId, systemId);
+            if (deleted) {
+                return ResponseEntity.ok(Map.of(
+                        "fileId", fileId,
+                        "message", "Archivo/Carpeta eliminado correctamente"
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                        "message", "Error al eliminar archivo/carpeta."
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Ocurrió un error al procesar la solicitud."
+            ));
+        }
+    }
 }
+   
+
 
 
 
