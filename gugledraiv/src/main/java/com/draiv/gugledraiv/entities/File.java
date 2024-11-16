@@ -42,7 +42,7 @@ public class File {
     @Column(nullable = false)
     private String name;
 
-    // @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String fileHash;
 
     // @Column(nullable = false)
@@ -86,6 +86,14 @@ public class File {
         this.filePath = filePath;
     }
 
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
+    }
+
     public String getSystemId() {
         return systemId;
     }
@@ -112,5 +120,10 @@ public class File {
     public void setIsPublic(boolean isPublic2) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setIsPublic'");
+    }
+
+    public void setfileHash(String fileHash2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setfileHash'");
     }
 }
