@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import com.draiv.gugledraiv.repositories.*;
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.interfaces.IFileService;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+
 import java.util.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -46,13 +44,23 @@ public class FileService implements IFileService {
     public String generateFileHash() {
       return UUID.randomUUID().toString().toUpperCase().substring(0,8);
 }
-    // Guardar un archivo con Hash único
-    public File saveFileWithHash(File file) {
-    file.setfileHash(generateFileHash()); 
-    return fileRepository.save(file);
-}
-    
 
+    // Generar URL pública con fileHash
+    public String generatePublicUrl(String fileHash) {
+        String baseUrl = "https:// /files/";
+        return baseUrl + fileHash;
+    }
+
+    // Guardar archivo con fileHash y URL pública
+    public File saveFileWithHash(File file) {
+        String fileHash = generateFileHash(); 
+        file.setFileHash(fileHash); 
+        String publicUrl = generatePublicUrl(fileHash); 
+        file.setFileURL(publicUrl); 
+        return fileRepository.save(file); 
+    }
+
+    
 
     public Resource getFileByHash(String fileHash) {
         try {

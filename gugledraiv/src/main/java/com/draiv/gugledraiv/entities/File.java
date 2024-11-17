@@ -51,7 +51,7 @@ public class File {
     // @Column(nullable = false)
     private Boolean isPublic;
 
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private String fileURL;
 
     @ManyToOne
@@ -92,6 +92,14 @@ public class File {
 
     public void setFileHash(String fileHash) {
         this.fileHash = fileHash;
+    }
+
+    public String getFileURL() {
+        return fileURL;
+    }
+
+    public void setFileURL(String fileURL) {
+        this.fileURL = fileURL;
     }
 
     public String getSystemId() {
