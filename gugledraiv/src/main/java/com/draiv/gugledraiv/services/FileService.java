@@ -26,8 +26,8 @@ public class FileService implements IFileService {
 
     @Override
     public File GetFileById(Long id) {
-        return fileRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("No se encontro el archivo con el ID:  " + id));
+        return fileRepository.findById(id).orElse(null);
+        /*.orElseThrow(() -> new NoSuchElementException("No se encontro el archivo con el ID:  " + id)); */
     }
 
     public File saveFile(File file) {

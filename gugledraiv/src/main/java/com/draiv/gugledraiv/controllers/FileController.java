@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
 
 import com.draiv.gugledraiv.entities.*;
+import com.draiv.gugledraiv.exceptions.BadRequestException;
 import com.draiv.gugledraiv.services.*;
 import com.google.common.io.Resources;
 
@@ -28,8 +29,12 @@ public class FileController {
     }
 
     @GetMapping("/files/{id}")
-    public File GetFileById(@PathVariable Long id) {
-        return fileService.GetFileById(id);
+    public ResponseEntity<File> GetFileById(@PathVariable Long id) {
+        File file = fileService.GetFileById(id);
+        if(file == null){
+            throw new BadRequestException("No existe el path indicado");
+        }
+        return new ResponseEntity<>(file, HttpStatus.OK);
     }
     
 
