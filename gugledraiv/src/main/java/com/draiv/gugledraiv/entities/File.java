@@ -1,14 +1,13 @@
 package com.draiv.gugledraiv.entities;
 
-import jakarta.persistence.Column;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class File {
@@ -39,10 +38,11 @@ public class File {
     // @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    
+    // @Column(nullable = false) 
     private String name;
 
-    @Column(nullable = false, unique = true)
+    // @Column(nullable = false, unique = true)
     private String fileHash;
 
     // @Column(nullable = false)
@@ -51,12 +51,18 @@ public class File {
     // @Column(nullable = false)
     private Boolean isPublic;
 
-    @Column(nullable = false)
+    // @Column(nullable = false)
     private String fileURL;
 
+    //Relacion muchos a uno con Folder
     @ManyToOne
     @JoinColumn(name = "folder_id")
     private Folder folder;
+
+    //Relacion muchos a uno con User
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public File() {
         super();
