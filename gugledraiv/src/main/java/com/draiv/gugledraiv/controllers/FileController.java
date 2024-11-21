@@ -36,9 +36,6 @@ public class FileController {
         }
         return new ResponseEntity<>(file, HttpStatus.OK);
     }
-    
-
-    // Agregar endpoints
 
     // Endpoint para obtener el enlace público de un archivo
     @GetMapping("/{fileHash}")
@@ -91,6 +88,7 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
     @DeleteMapping("/files/{fileId}")
     public ResponseEntity<Map<String, String>> deleteFileOrFolder(
             @PathVariable String fileId,
@@ -99,14 +97,12 @@ public class FileController {
             String token = request.get("token");
             String systemId = request.get("systemId");
 
-            // Verificación de autenticación (opcional, según tu lógica)
             if (!fileService.isAuthenticated(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                         "message", "No autenticado."
                 ));
             }
 
-            // Llamada al servicio para eliminar el archivo o carpeta
             boolean deleted = fileService.deleteFileOrFolder(fileId, systemId);
             if (deleted) {
                 return ResponseEntity.ok(Map.of(
