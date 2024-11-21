@@ -10,53 +10,73 @@ import jakarta.persistence.JoinColumn;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Table;
+
 @Entity
+@Table (name = "files")
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // @Column(nullable = false)
+    @Column (name = "token")
     private String token;
 
+    @Column (name = "system_id")
     private String systemId;
 
     // @Column(nullable = false)
+    @Column (name = "is_folder")
     private Boolean isFolder;
 
     // @Column(nullable = false)
+    @Column (name = "file_path")
     private String filePath;
 
     // @Column(nullable = false)
+    @Column (name = "file_ext")
     private String fileExt;
 
     // @Column(nullable = false)
+    @Column (name = "file_name")
     private String fileName;
 
     // @Column(nullable = false)
+    @Column (name = "mime_type")
     private String mimeType;
 
     // @Column(nullable = false)
+    @Column (name = "content")
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "file_hash", nullable = false, unique = true)
     private String fileHash;
 
     // @Column(nullable = false)
+    @Column (name = "upload_date")
     private LocalDateTime uploadDate;
 
     // @Column(nullable = false)
+    @Column (name = "is_public")
     private Boolean isPublic;
 
-    @Column(nullable = false)
+    @Column(name = "file_url", nullable = false)
     private String fileURL;
 
+    //Relacion con Folder
     @ManyToOne
     @JoinColumn(name = "folder_id")
     private Folder folder;
+
+    //Relaacion con Users
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
 
     public File() {
         super();
@@ -105,6 +125,7 @@ public class File {
     public String getSystemId() {
         return systemId;
     }
+
     public void setSystemId(String systemId2) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setSystemId'");
@@ -133,5 +154,21 @@ public class File {
     public void setfileHash(String fileHash2) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setfileHash'");
+    }
+
+    public Folder getFolder() {
+        return folder;
+    }
+
+    public void setFolder(Folder folder) {
+        this.folder = folder;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 }
