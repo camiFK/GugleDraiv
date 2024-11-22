@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Table;
 
 @Entity
-@Table (name = "files")
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
