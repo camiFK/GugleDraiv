@@ -1,22 +1,26 @@
 package com.draiv.gugledraiv.controllers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.Resource;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
-
-import com.draiv.gugledraiv.entities.*;
-import com.draiv.gugledraiv.exceptions.BadRequestException;
-import com.draiv.gugledraiv.services.*;
-import com.google.common.io.Resources;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.MalformedURLException;
-import java.nio.file.Paths;
-import java.util.*;
+import com.draiv.gugledraiv.entities.File;
+import com.draiv.gugledraiv.exceptions.BadRequestException;
+import com.draiv.gugledraiv.services.FileService;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
@@ -24,12 +28,12 @@ public class FileController {
     private FileService fileService;
 
     @GetMapping({"/files", "/"})
-    public List<File> getAllFiles() {
+    public List<File> getAllFiles(@RequestParam String token, @RequestParam String systemId, @RequestParam String path) {
         return fileService.GetAllFiles();
     }
 
     @GetMapping("/files/{id}")
-    public ResponseEntity<File> GetFileById(@PathVariable Long id) {
+    public ResponseEntity<File> GetFileById(@PathVariable Long id, @RequestParam String token, @RequestParam String systemId) {
         File file = fileService.GetFileById(id);
         if(file == null){
             throw new BadRequestException("No existe el path indicado");
@@ -51,17 +55,21 @@ public class FileController {
 
     // Endpoint para descargar un archivo
     @GetMapping("/download/{fileHash}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileHash) {
+    public ResponseEntity<Object> downloadFile(@PathVariable String fileHash) {
         try {
             Resource file = fileService.getFileByHash(fileHash);
             if (file == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                        "message", "No existe el archivo solicitado."
+                ));
             }
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Ocurrió un error al procesar la solicitud."
+            ));
         }
     }
 
