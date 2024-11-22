@@ -58,17 +58,21 @@ public class FileController {
 
     // Endpoint para descargar un archivo
     @GetMapping("/download/{fileHash}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileHash) {
+    public ResponseEntity<Object> downloadFile(@PathVariable String fileHash) {
         try {
             Resource file = fileService.getFileByHash(fileHash);
             if (file == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                        "message", "No existe el archivo solicitado."
+                ));
             }
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Ocurrió un error al procesar la solicitud."
+            ));
         }
     }
 
