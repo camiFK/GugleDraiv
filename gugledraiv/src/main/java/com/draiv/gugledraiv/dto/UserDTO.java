@@ -5,6 +5,7 @@ public class UserDTO {
     private Long id;
     private String userName;
     private String token;
+    private Integer expiresIn;
 
     public UserDTO() {
         super();
@@ -39,5 +40,12 @@ public class UserDTO {
         return this.token = token;
     }
 
+    public Integer getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
+    }
     
 }

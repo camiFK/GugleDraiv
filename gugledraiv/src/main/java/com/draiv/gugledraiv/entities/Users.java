@@ -23,10 +23,14 @@ public class Users {
     @Column(name = "token")
     private String token;
 
+    @Column(name = "expiresIn")
+    private Integer expiresIn;
+
+    
     //Relaciom con File
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<File> files;
-
+    
     public Users() {
     }
 
@@ -49,18 +53,24 @@ public class Users {
     public List<File> getFiles() {
         return files;
     }
-
+    
     public void setFiles(List<File> files) {
         this.files = files;
     }
-
+    
     public String getUserName() {
         return userName;
     }
-
+    
     public void setUserName(String userName) {
         this.userName = userName;
     }
+    
+    public Integer getExpiresIn() {
+        return expiresIn;
+    }
 
-
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
+    }
 }

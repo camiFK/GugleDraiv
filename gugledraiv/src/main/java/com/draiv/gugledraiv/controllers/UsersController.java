@@ -39,6 +39,7 @@ public class UsersController {
         Users user = new Users();
         user.setUserName(userRequest.getUserName());
         user.setToken(userRequest.getToken());
+        user.setExpiresIn(userRequest.getExpiresIn());
 
         Users savedUser = userRepository.save(user);
         
