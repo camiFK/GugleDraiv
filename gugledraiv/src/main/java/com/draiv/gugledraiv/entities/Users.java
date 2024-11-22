@@ -12,7 +12,6 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Users {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
