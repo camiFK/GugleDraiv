@@ -14,10 +14,10 @@ import jakarta.persistence.OneToMany;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "userId")
     private Long userId;
 
-    @Column(name = "user_name")
+    @Column(name = "userName")
     private String userName;
 
     @Column(name = "token")

@@ -31,7 +31,7 @@ public class UserDTO {
         return this.id = id;
     }
 
-    public void setUserName(String username) {
+    public void setUserName(String userName) {
         this.userName = userName;
     }
 

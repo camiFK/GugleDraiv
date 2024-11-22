@@ -22,27 +22,27 @@ public class File {
     @Column (name = "token")
     private String token;
 
-    @Column (name = "system_id")
+    @Column (name = "systemId")
     private String systemId;
 
     // @Column(nullable = false)
-    @Column (name = "is_folder")
+    @Column (name = "isFolder")
     private Boolean isFolder;
 
     // @Column(nullable = false)
-    @Column (name = "file_path")
+    @Column (name = "filePath")
     private String filePath;
 
     // @Column(nullable = false)
-    @Column (name = "file_ext")
+    @Column (name = "fileExt")
     private String fileExt;
 
     // @Column(nullable = false)
-    @Column (name = "file_name")
+    @Column (name = "fileName")
     private String fileName;
 
     // @Column(nullable = false)
-    @Column (name = "mime_type")
+    @Column (name = "mimeType")
     private String mimeType;
 
     // @Column(nullable = false)
@@ -52,28 +52,28 @@ public class File {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "file_hash", nullable = false, unique = true)
+    @Column(name = "fileHash", nullable = false, unique = true)
     private String fileHash;
 
     // @Column(nullable = false)
-    @Column (name = "upload_date")
+    @Column (name = "uploadDate")
     private LocalDateTime uploadDate;
 
     // @Column(nullable = false)
-    @Column (name = "is_public")
+    @Column (name = "isPublic")
     private Boolean isPublic;
 
-    @Column(name = "file_url", nullable = false)
+    @Column(name = "fileUrl", nullable = false)
     private String fileURL;
 
     //Relacion con Folder
     @ManyToOne
-    @JoinColumn(name = "folder_id")
+    @JoinColumn(name = "folderId")
     private Folder folder;
 
     //Relaacion con Users
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private Users user;
 
 
