@@ -162,31 +162,20 @@ public class FileService {
         return response;
     }
 
-    // public boolean deleteFileOrFolder(String fileId, String systemId) {
-    //     Long id;
-    //     try {
-    //         id = Long.parseLong(fileId);
-    //     } catch (NumberFormatException e) {
-    //         return false;
-    //     }
-
-    //     Optional<Folder> folderOptional = folderRepository.findById(id);
-    //     if (folderOptional.isPresent()) {
-    //         Folder folder = folderOptional.get();
-    //         folderRepository.delete(folder);
-    //         return true;
-    //     }
-
-    //     Optional<File> fileOptional = fileRepository.findById(id);
-    //     if (fileOptional.isPresent()) {
-    //         File file = fileOptional.get();
-    //         if (!file.getSystemId().equals(systemId)) {
-    //             return false;
-    //         }
-    //         fileRepository.delete(file);
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
+    public boolean deleteFileOrFolder(Long fileId, String systemId) {
+    
+        Optional<File> toDeleteFile = fileRepository.findById(fileId);
+        if (toDeleteFile.isPresent()) {
+            File file = toDeleteFile.get();
+   
+            if (file.isFolder) {
+                fileRepository.deleteAll(file.getChildren());
+            }
+    
+            fileRepository.delete(file);
+            return true;
+        }
+    
+        return false; 
+    }
 }

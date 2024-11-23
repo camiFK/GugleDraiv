@@ -14,7 +14,7 @@ public class File {
     private String systemId;
 
     @Column (name = "isFolder", nullable = false)
-    private Boolean isFolder;
+    public Boolean isFolder;
 
     @Column (name = "filePath", nullable = false)
     private String filePath;
@@ -44,13 +44,14 @@ public class File {
     private String fileURL;
 
     //Relacion recursiva para carpetas
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folderId")
     private File folder;
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<File> children;
 
+    
     //Relaacion con Users
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
@@ -95,7 +96,7 @@ public class File {
     public void setFileExt(String fileExt) {
         this.fileExt = fileExt;
     }
-
+    
     public String getFileName() {
         return fileName;
     }
@@ -107,7 +108,7 @@ public class File {
     public String getMimeType() {
         return mimeType;
     }
-
+    
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
     }
@@ -159,5 +160,12 @@ public class File {
     public void setUser(Users user) {
         this.user = user;
     }
-
+    
+    public List<File> getChildren() {
+        return children;
+    }
+    
+    public void setChildren(List<File> children) {
+        this.children = children;
+    }
 }

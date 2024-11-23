@@ -140,37 +140,36 @@ public class FileController {
         }
     }
 
-    // @DeleteMapping("/files/{fileId}")
-    // public ResponseEntity<Map<String, String>> deleteFileOrFolder(
-    //         @PathVariable String fileId,
-    //         @RequestBody Map<String, String> request) {
-    //     try {
-    //         String token = request.get("token");
-    //         String systemId = request.get("systemId");
+    @DeleteMapping("/files/{fileId}")
+    public  ResponseEntity<?> deleteFileOrFolder(
+            @PathVariable String fileId,
+            @RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("token");
+            String systemId = request.get("systemId");
 
-    //         if (!userService.isAuthenticated(token)) {
-    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-    //                     "message", "No autenticado."
-    //             ));
-    //         }
+            if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
+            }
 
-    //         boolean deleted = fileService.deleteFileOrFolder(fileId, systemId);
-    //         if (deleted) {
-    //             return ResponseEntity.ok(Map.of(
-    //                     "fileId", fileId,
-    //                     "message", "Archivo/Carpeta eliminado correctamente"
-    //             ));
-    //         } else {
-    //             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-    //                     "message", "Error al eliminar archivo/carpeta."
-    //             ));
-    //         }
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-    //                 "message", "Ocurrió un error al procesar la solicitud."
-    //         ));
-    //     }
-    // }
+            boolean deleted = fileService.deleteFileOrFolder(Long.parseLong(fileId), systemId);
+            
+            if (deleted) {
+                return ResponseEntity.ok(Map.of(
+                        "fileId", fileId,
+                        "message", "Archivo/Carpeta eliminado correctamente"
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                        "message", "Error al eliminar archivo/carpeta."
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Ocurrió un error al procesar la solicitud."
+            ));
+        }
+    }
 }
    
 
