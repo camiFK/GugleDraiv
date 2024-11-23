@@ -3,10 +3,12 @@ package com.draiv.gugledraiv.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.draiv.gugledraiv.repositories.*;
+import com.draiv.gugledraiv.dto.FileDTO;
 import com.draiv.gugledraiv.entities.*;
-import com.draiv.gugledraiv.interfaces.IFileService;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import java.nio.file.Path;
@@ -14,33 +16,81 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 
 @Service
-public class FileService implements IFileService {
+public class FileService {
 
     @Autowired
     private FileRepository fileRepository;
     @Autowired
     private FolderRepository folderRepository;
+    private UserRepository userRepository;
 
-    public List<File> GetAllFiles() {
-        return fileRepository.findAll();
+    public FileService(UserRepository userRepository, FileRepository fileRepository) {
+        this.userRepository = userRepository;
+        this.fileRepository = fileRepository;
     }
 
-    @Override
-    public File GetFileById(Long id) {
-        return fileRepository.findById(id).orElse(null);
-        /*
-         * .orElseThrow(() -> new
-         * NoSuchElementException("No se encontro el archivo con el ID:  " + id));
-         */
+    public List<FileDTO> getFiles(String token, String systemId, String path) {
+
+        if (token == null || systemId == null) {
+            throw new IllegalArgumentException("Token y systemId son obligatorios.");
+        }
+
+        Users user = userRepository.findByToken(token);
+
+        if (user == null) {
+            throw new NoSuchElementException("No se encontro el usuario");
+        }
+
+        List<File> files;
+        if (path != null && !path.isEmpty()) {
+            files = fileRepository.findByUserAndFilePath(user, path);
+        } else {
+            files = fileRepository.findBySystemIdAndFilePath(systemId, path);
+        }
+
+        if(files == null) {
+            throw new NoSuchElementException("No se encontraron archivos para el usuario " + user);
+        }
+
+        return files.stream().map(file -> new FileDTO(
+                file.getId(),
+                file.getIsFolder(),
+                file.getFilePath(),
+                file.getFileExt(),
+                file.getFileName(),
+                file.getMimeType(),
+                file.getContent(),
+                file.getIsPublic(),
+                file.getFileURL())).collect(Collectors.toList());
+    }
+
+    public FileDTO getFileById(Long fileId) {
+        File file = fileRepository.findById(fileId).orElse(null);
+
+        if (file == null) {
+            throw new IllegalArgumentException("No existe el archivo indicado.");
+        }
+
+        return mapToFileDTO(file);
+    }
+
+    private FileDTO mapToFileDTO(File file) {
+        FileDTO dto = new FileDTO();
+        dto.setId(file.getId());
+        dto.setIsFolder(file.getIsFolder());
+        dto.setFilePath(file.getFilePath());
+        dto.setFileExt(file.getFileExt());
+        dto.setFileName(file.getFileName());
+        dto.setMimeType(file.getMimeType());
+        dto.setContent(file.getIsFolder() ? null : file.getContent()); 
+        dto.setIsPublic(file.getIsPublic());
+        dto.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
+        return dto;
     }
 
     public File saveFile(File file) {
         return fileRepository.save(file);
     }
-
-    // public File getAllFilesByUserId(Long userId) {
-    // return fileRepository.findById(userId).get();
-    // }
 
     // Generar UUID
     public String generateFileHash() {
@@ -77,10 +127,6 @@ public class FileService implements IFileService {
             return null;
         }
 
-    }
-
-    public boolean isAuthenticated(String token) {
-        return "token_valido".equals(token);
     }
 
     public Map<String, String> createFileOrFolder(String systemId, boolean isFolder, String filePath, String fileExt,

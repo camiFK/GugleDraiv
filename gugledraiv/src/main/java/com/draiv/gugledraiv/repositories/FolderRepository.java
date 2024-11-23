@@ -14,12 +14,12 @@ import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
 
-    // Buscar archivos fuera carpetas pertenecientes a un usuario específico (userId);   
-    // @Query(value = "SELECT * FROM file f WHERE f.folder_id IS NULL AND f.user_id = :userId", nativeQuery = true)
-   // List<File> findByFolderIsNullAndFolderUserId(@Param("userId") Long userId);
+    // Buscar archivos fuera carpetas pertenecientes a un usuario específico (idUser);   
+    // @Query(value = "SELECT * FROM file f WHERE f.folder_id IS NULL AND f.user_id = :idUser", nativeQuery = true)
+   // List<File> findByFolderIsNullAndFolderUserId(@Param("idUser") Long idUser);
 
-    // Buscar carpeta por userId y ruta;
-   // @Query(value = "SELECT f FROM Folder f WHERE f.user.userId = :userId AND f.path = :path")
-   // Optional<Folder> findByUserIdAndPath(@Param("userId") String userId, @Param("path") String path);
+    // Buscar carpeta por idUser y ruta;
+   // @Query(value = "SELECT f FROM Folder f WHERE f.user.idUser = :idUser AND f.path = :path")
+   // Optional<Folder> findByUserIdAndPath(@Param("idUser") String idUser, @Param("path") String path);
 }
 

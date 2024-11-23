@@ -17,31 +17,74 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.draiv.gugledraiv.entities.File;
+import com.draiv.gugledraiv.dto.FileDTO;
+import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.exceptions.BadRequestException;
+import com.draiv.gugledraiv.repositories.UserRepository;
 import com.draiv.gugledraiv.services.FileService;
+import com.draiv.gugledraiv.services.UserService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class FileController {
     @Autowired
     private FileService fileService;
+    private UserService userService;
 
-    @GetMapping({"/files", "/"})
-    public List<File> getAllFiles(@RequestParam String token, @RequestParam String systemId, @RequestParam String path) {
-        return fileService.GetAllFiles();
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
     }
 
-    @GetMapping("/files/{id}")
-    public ResponseEntity<File> GetFileById(@PathVariable Long id, @RequestParam String token, @RequestParam String systemId) {
-        File file = fileService.GetFileById(id);
-        if(file == null){
-            throw new BadRequestException("No existe el path indicado");
+    @GetMapping({ "/files", "/" })
+    public ResponseEntity<?> getFiles(
+            @RequestParam String token,
+            @RequestParam String systemId,
+            @RequestParam(required = false) String path) {
+        try {
+            if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
+            }
+
+            List<FileDTO> files = fileService.getFiles(token, systemId, path);
+
+            if (files != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(files);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el path indicado.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
         }
-        return new ResponseEntity<>(file, HttpStatus.OK);
     }
 
-    // Endpoint para obtener el enlace público de un archivo
+    @GetMapping("/files/{fileId}")
+    public ResponseEntity<?> getFileById(
+            @PathVariable Long fileId,
+            @RequestParam String token,
+            @RequestParam String systemId) {
+        try {
+            if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
+            }
+
+            FileDTO fileDTO = fileService.getFileById(fileId);
+
+            if (fileDTO != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(fileDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body("No existe el path indicado.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
+        }
+    }
+
     @GetMapping("/{fileHash}")
     public ResponseEntity<?> getFilePublicUrl(@PathVariable String fileHash) {
         Resource fileResource = fileService.getFileByHash(fileHash); 
@@ -78,7 +121,7 @@ public class FileController {
     public ResponseEntity<Map<String, String>> createFileOrFolder(@RequestBody Map<String, Object> request) {
         try {
             String token = (String) request.get("token");
-            if (!fileService.isAuthenticated(token)) {
+            if (!userService.isAuthenticated(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             String systemId = (String) request.get("systemId");
@@ -105,7 +148,7 @@ public class FileController {
             String token = request.get("token");
             String systemId = request.get("systemId");
 
-            if (!fileService.isAuthenticated(token)) {
+            if (!userService.isAuthenticated(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                         "message", "No autenticado."
                 ));

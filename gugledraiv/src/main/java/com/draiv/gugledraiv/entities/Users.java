@@ -14,13 +14,13 @@ import jakarta.persistence.OneToMany;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idUser")
+    private Long idUser;
+
     @Column(name = "userId")
-    private Long userId;
+    private String userId;
 
-    @Column(name = "userName")
-    private String userName;
-
-    @Column(name = "token")
+    @Column(name = "token", unique = true, nullable = false)
     private String token;
 
     @Column(name = "expiresIn")
@@ -35,11 +35,11 @@ public class Users {
     }
 
     public Long getUserId() {
-        return userId;
+        return idUser;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserId(Long idUser) {
+        this.idUser = idUser;
     }
 
     public String getToken() {
@@ -59,11 +59,11 @@ public class Users {
     }
     
     public String getUserName() {
-        return userName;
+        return userId;
     }
     
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(String userId) {
+        this.userId = userId;
     }
     
     public Integer getExpiresIn() {

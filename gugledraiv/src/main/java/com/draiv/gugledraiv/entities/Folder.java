@@ -16,4 +16,6 @@ public class Folder {
     private List<File> files;
 
     // Agregar Getters y setters
+
+    
 }

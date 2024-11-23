@@ -30,7 +30,7 @@ public class File {
     private Boolean isFolder;
 
     // @Column(nullable = false)
-    @Column (name = "filePath")
+    @Column (name = "filePath", nullable = false)
     private String filePath;
 
     // @Column(nullable = false)
@@ -63,7 +63,7 @@ public class File {
     @Column (name = "isPublic")
     private Boolean isPublic;
 
-    @Column(name = "fileUrl", nullable = false)
+    @Column(name = "fileUrl")
     private String fileURL;
 
     //Relacion con Folder
@@ -73,13 +73,8 @@ public class File {
 
     //Relaacion con Users
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "idUser", nullable = false)
     private Users user;
-
-
-    public File() {
-        super();
-    }
 
     public Long getId() {
         return id;
@@ -89,12 +84,28 @@ public class File {
         this.id = id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getToken() {
+        return token;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getSystemId() {
+        return systemId;
+    }
+
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
+    }
+
+    public Boolean getIsFolder() {
+        return isFolder;
+    }
+
+    public void setIsFolder(Boolean isFolder) {
+        this.isFolder = isFolder;
     }
 
     public String getFilePath() {
@@ -105,6 +116,46 @@ public class File {
         this.filePath = filePath;
     }
 
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public void setFileExt(String fileExt) {
+        this.fileExt = fileExt;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFileHash() {
         return fileHash;
     }
@@ -113,46 +164,28 @@ public class File {
         this.fileHash = fileHash;
     }
 
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     public String getFileURL() {
         return fileURL;
     }
 
     public void setFileURL(String fileURL) {
         this.fileURL = fileURL;
-    }
-
-    public String getSystemId() {
-        return systemId;
-    }
-
-    public void setSystemId(String systemId2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setSystemId'");
-    }
-
-    public void setIsFolder(boolean isFolder2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setIsFolder'");
-    }
-
-    public void setMimeType(String mimeType2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setMimeType'");
-    }
-
-    public void setContent(String content2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setContent'");
-    }
-
-    public void setIsPublic(boolean isPublic2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setIsPublic'");
-    }
-
-    public void setfileHash(String fileHash2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setfileHash'");
     }
 
     public Folder getFolder() {
@@ -170,4 +203,5 @@ public class File {
     public void setUser(Users user) {
         this.user = user;
     }
+
 }

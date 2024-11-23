@@ -3,17 +3,13 @@ package com.draiv.gugledraiv.dto;
 public class UserDTO {
 
     private Long id;
-    private String userName;
+    private String userId;
     private String token;
     private Integer expiresIn;
-
-    public UserDTO() {
-        super();
-    }
-
-    public UserDTO(Long id, String userName, String token) {
+    
+    public UserDTO(Long id, String userId, String token) {
         this.id = id;
-        this.userName = userName;
+        this.userId = userId;
         this.token = token;
     }
     public Long getId() {
@@ -21,7 +17,7 @@ public class UserDTO {
     }
 
     public String getUserName() {
-        return userName;
+        return userId;
     }
 
     public String getToken() {
@@ -32,8 +28,8 @@ public class UserDTO {
         return this.id = id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(String userId) {
+        this.userId = userId;
     }
 
     public String setToken(String token) {

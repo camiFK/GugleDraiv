@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import com.draiv.gugledraiv.entities.*;
 
-
 @Repository
 public interface FileRepository extends JpaRepository<File, Long> {
     // Buscar archivos desde una carpeta específica;
@@ -18,4 +17,12 @@ public interface FileRepository extends JpaRepository<File, Long> {
     List<File> findByFolder(@Param("folder") Folder folder);
 
     Optional<File> findByFileHash(String fileHash); 
+
+    List<File> findByUser(Users user);
+
+    List<File> findByUserAndFilePath(Users user, String filePath);
+
+    List<File> findBySystemIdAndFilePath(String systemId, String filePath);
+
+    List<File> findBySystemId(String systemId);
 }
