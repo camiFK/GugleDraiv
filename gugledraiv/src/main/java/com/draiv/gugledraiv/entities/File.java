@@ -1,16 +1,8 @@
 package com.draiv.gugledraiv.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Table;
+import java.util.*;
+import jakarta.persistence.*;
 
 @Entity
 public class File {
@@ -18,62 +10,50 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @Column(nullable = false)
-    @Column (name = "token")
-    private String token;
-
     @Column (name = "systemId")
     private String systemId;
 
-    // @Column(nullable = false)
-    @Column (name = "isFolder")
+    @Column (name = "isFolder", nullable = false)
     private Boolean isFolder;
 
-    // @Column(nullable = false)
     @Column (name = "filePath", nullable = false)
     private String filePath;
 
-    // @Column(nullable = false)
     @Column (name = "fileExt")
     private String fileExt;
 
-    // @Column(nullable = false)
-    @Column (name = "fileName")
+    @Column (name = "fileName", nullable = false)
     private String fileName;
 
-    // @Column(nullable = false)
     @Column (name = "mimeType")
     private String mimeType;
 
-    // @Column(nullable = false)
     @Column (name = "content")
     private String content;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "fileHash", nullable = false, unique = true)
+    @Column(name = "fileHash", unique = true)
     private String fileHash;
 
-    // @Column(nullable = false)
-    @Column (name = "uploadDate")
+    @Column (name = "uploadDate", nullable = false)
     private LocalDateTime uploadDate;
 
-    // @Column(nullable = false)
-    @Column (name = "isPublic")
+    @Column (name = "isPublic", nullable = false)
     private Boolean isPublic;
 
     @Column(name = "fileUrl")
     private String fileURL;
 
-    //Relacion con Folder
+    //Relacion recursiva para carpetas
     @ManyToOne
     @JoinColumn(name = "folderId")
-    private Folder folder;
+    private File folder;
+
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<File> children;
 
     //Relaacion con Users
     @ManyToOne
-    @JoinColumn(name = "idUser", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private Users user;
 
     public Long getId() {
@@ -82,14 +62,6 @@ public class File {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getSystemId() {
@@ -148,14 +120,6 @@ public class File {
         this.content = content;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getFileHash() {
         return fileHash;
     }
@@ -186,14 +150,6 @@ public class File {
 
     public void setFileURL(String fileURL) {
         this.fileURL = fileURL;
-    }
-
-    public Folder getFolder() {
-        return folder;
-    }
-
-    public void setFolder(Folder folder) {
-        this.folder = folder;
     }
 
     public Users getUser() {

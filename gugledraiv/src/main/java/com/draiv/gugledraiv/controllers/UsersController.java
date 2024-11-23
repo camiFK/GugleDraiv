@@ -29,7 +29,7 @@ public class UsersController {
         List<Users> allUsers = userRepository.findAll();
 
         List<UserDTO> userDTOs = allUsers.stream()
-                    .map(u -> new UserDTO(u.getUserId(), u.getUserName(), u.getToken()))
+                    .map(u -> new UserDTO(u.getUserId(), u.getToken(), u.getExpiresIn()))
                     .collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
@@ -37,7 +37,7 @@ public class UsersController {
     @PostMapping("/users")
     public ResponseEntity<String> saveUser(@RequestBody UserDTO userRequest) {  
         Users user = new Users();
-        user.setUserName(userRequest.getUserName());
+        user.setUserId(userRequest.getUserId());
         user.setToken(userRequest.getToken());
         user.setExpiresIn(userRequest.getExpiresIn());
 

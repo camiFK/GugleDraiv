@@ -98,4 +98,18 @@ public class FileDTO {
     public void setFileURL(String fileURL) {
         this.fileURL = fileURL;
     }
+
+    @Override
+    public String toString() {
+        return "FileDTO{" +
+                "id=" + id +
+                ", isFolder=" + isFolder +
+                ", filePath='" + filePath + '\'' +
+                ", fileExt='" + fileExt + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", isPublic=" + isPublic +
+                ", fileURL='" + fileURL + '\'' +
+                '}';
+    }
 }

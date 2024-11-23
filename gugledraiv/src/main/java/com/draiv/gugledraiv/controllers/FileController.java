@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.draiv.gugledraiv.dto.FileDTO;
 import com.draiv.gugledraiv.entities.*;
-import com.draiv.gugledraiv.exceptions.BadRequestException;
 import com.draiv.gugledraiv.repositories.UserRepository;
 import com.draiv.gugledraiv.services.FileService;
 import com.draiv.gugledraiv.services.UserService;
@@ -41,16 +40,17 @@ public class FileController {
             @RequestParam String systemId,
             @RequestParam(required = false) String path) {
         try {
+
             if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son parametros obligatorios.");
             }
 
             List<FileDTO> files = fileService.getFiles(token, systemId, path);
 
-            if (files != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(files);
-            } else {
+            if (files == null || files.isEmpty()) {       
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el path indicado.");
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(files);
             }
 
         } catch (IllegalArgumentException e) {
@@ -70,12 +70,12 @@ public class FileController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
             }
 
-            FileDTO fileDTO = fileService.getFileById(fileId);
+            FileDTO fileDTO = fileService.getFileById(fileId, token);
 
-            if (fileDTO != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(fileDTO);
+            if (fileDTO == null) {          
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el archivo/carpeta indicado.");
             } else {
-                return ResponseEntity.status(HttpStatus.OK).body("No existe el path indicado.");
+                return ResponseEntity.status(HttpStatus.OK).body(fileDTO);
             }
 
         } catch (IllegalArgumentException e) {
@@ -140,37 +140,37 @@ public class FileController {
         }
     }
 
-    @DeleteMapping("/files/{fileId}")
-    public ResponseEntity<Map<String, String>> deleteFileOrFolder(
-            @PathVariable String fileId,
-            @RequestBody Map<String, String> request) {
-        try {
-            String token = request.get("token");
-            String systemId = request.get("systemId");
+    // @DeleteMapping("/files/{fileId}")
+    // public ResponseEntity<Map<String, String>> deleteFileOrFolder(
+    //         @PathVariable String fileId,
+    //         @RequestBody Map<String, String> request) {
+    //     try {
+    //         String token = request.get("token");
+    //         String systemId = request.get("systemId");
 
-            if (!userService.isAuthenticated(token)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                        "message", "No autenticado."
-                ));
-            }
+    //         if (!userService.isAuthenticated(token)) {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+    //                     "message", "No autenticado."
+    //             ));
+    //         }
 
-            boolean deleted = fileService.deleteFileOrFolder(fileId, systemId);
-            if (deleted) {
-                return ResponseEntity.ok(Map.of(
-                        "fileId", fileId,
-                        "message", "Archivo/Carpeta eliminado correctamente"
-                ));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                        "message", "Error al eliminar archivo/carpeta."
-                ));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Ocurrió un error al procesar la solicitud."
-            ));
-        }
-    }
+    //         boolean deleted = fileService.deleteFileOrFolder(fileId, systemId);
+    //         if (deleted) {
+    //             return ResponseEntity.ok(Map.of(
+    //                     "fileId", fileId,
+    //                     "message", "Archivo/Carpeta eliminado correctamente"
+    //             ));
+    //         } else {
+    //             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+    //                     "message", "Error al eliminar archivo/carpeta."
+    //             ));
+    //         }
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+    //                 "message", "Ocurrió un error al procesar la solicitud."
+    //         ));
+    //     }
+    // }
 }
    
 

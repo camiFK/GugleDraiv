@@ -20,8 +20,8 @@ public class FileService {
 
     @Autowired
     private FileRepository fileRepository;
+
     @Autowired
-    private FolderRepository folderRepository;
     private UserRepository userRepository;
 
     public FileService(UserRepository userRepository, FileRepository fileRepository) {
@@ -31,10 +31,6 @@ public class FileService {
 
     public List<FileDTO> getFiles(String token, String systemId, String path) {
 
-        if (token == null || systemId == null) {
-            throw new IllegalArgumentException("Token y systemId son obligatorios.");
-        }
-
         Users user = userRepository.findByToken(token);
 
         if (user == null) {
@@ -43,13 +39,9 @@ public class FileService {
 
         List<File> files;
         if (path != null && !path.isEmpty()) {
-            files = fileRepository.findByUserAndFilePath(user, path);
+            files = fileRepository.findByUser_UserIdAndFilePath(user.getUserId(), path);
         } else {
-            files = fileRepository.findBySystemIdAndFilePath(systemId, path);
-        }
-
-        if(files == null) {
-            throw new NoSuchElementException("No se encontraron archivos para el usuario " + user);
+            files = fileRepository.findByUser_UserId(user.getUserId());
         }
 
         return files.stream().map(file -> new FileDTO(
@@ -64,14 +56,19 @@ public class FileService {
                 file.getFileURL())).collect(Collectors.toList());
     }
 
-    public FileDTO getFileById(Long fileId) {
-        File file = fileRepository.findById(fileId).orElse(null);
+    public FileDTO getFileById(Long fileId, String token) {
 
-        if (file == null) {
-            throw new IllegalArgumentException("No existe el archivo indicado.");
+        Users user = userRepository.findByToken(token);
+
+        if (user == null) {
+            throw new NoSuchElementException("No se encontro el usuario");
         }
 
-        return mapToFileDTO(file);
+        File file = fileRepository.findByUser_UserIdAndId(user.getUserId(), fileId);
+
+        FileDTO fileDTO = mapToFileDTO(file);
+
+        return fileDTO;
     }
 
     private FileDTO mapToFileDTO(File file) {
@@ -81,7 +78,7 @@ public class FileService {
         dto.setFilePath(file.getFilePath());
         dto.setFileExt(file.getFileExt());
         dto.setFileName(file.getFileName());
-        dto.setMimeType(file.getMimeType());
+        dto.setMimeType(file.getIsFolder() ? null : file.getMimeType());
         dto.setContent(file.getIsFolder() ? null : file.getContent()); 
         dto.setIsPublic(file.getIsPublic());
         dto.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
@@ -129,9 +126,16 @@ public class FileService {
 
     }
 
-    public Map<String, String> createFileOrFolder(String systemId, boolean isFolder, String filePath, String fileExt,
-            String fileName, String mimeType, String content, boolean isPublic) {
-            Map<String, String> response = new HashMap<>();
+    public Map<String, String> createFileOrFolder(
+            String systemId,
+            boolean isFolder,
+            String filePath,
+            String fileExt,
+            String fileName,
+            String mimeType,
+            String content,
+            boolean isPublic) {
+        Map<String, String> response = new HashMap<>();
 
         try {
             File file = new File();
@@ -158,31 +162,31 @@ public class FileService {
         return response;
     }
 
-    public boolean deleteFileOrFolder(String fileId, String systemId) {
-        Long id;
-        try {
-            id = Long.parseLong(fileId);
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    // public boolean deleteFileOrFolder(String fileId, String systemId) {
+    //     Long id;
+    //     try {
+    //         id = Long.parseLong(fileId);
+    //     } catch (NumberFormatException e) {
+    //         return false;
+    //     }
 
-        Optional<Folder> folderOptional = folderRepository.findById(id);
-        if (folderOptional.isPresent()) {
-            Folder folder = folderOptional.get();
-            folderRepository.delete(folder);
-            return true;
-        }
+    //     Optional<Folder> folderOptional = folderRepository.findById(id);
+    //     if (folderOptional.isPresent()) {
+    //         Folder folder = folderOptional.get();
+    //         folderRepository.delete(folder);
+    //         return true;
+    //     }
 
-        Optional<File> fileOptional = fileRepository.findById(id);
-        if (fileOptional.isPresent()) {
-            File file = fileOptional.get();
-            if (!file.getSystemId().equals(systemId)) {
-                return false;
-            }
-            fileRepository.delete(file);
-            return true;
-        }
+    //     Optional<File> fileOptional = fileRepository.findById(id);
+    //     if (fileOptional.isPresent()) {
+    //         File file = fileOptional.get();
+    //         if (!file.getSystemId().equals(systemId)) {
+    //             return false;
+    //         }
+    //         fileRepository.delete(file);
+    //         return true;
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 }

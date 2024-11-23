@@ -14,20 +14,16 @@ import jakarta.persistence.OneToMany;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idUser")
-    private Long idUser;
-
     @Column(name = "userId")
-    private String userId;
-
+    private Long userId;
+ 
     @Column(name = "token", unique = true, nullable = false)
     private String token;
 
     @Column(name = "expiresIn")
     private Integer expiresIn;
 
-    
-    //Relaciom con File
+    //Relacion con File
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<File> files;
     
@@ -35,11 +31,11 @@ public class Users {
     }
 
     public Long getUserId() {
-        return idUser;
+        return userId;
     }
 
-    public void setUserId(Long idUser) {
-        this.idUser = idUser;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getToken() {
@@ -56,14 +52,6 @@ public class Users {
     
     public void setFiles(List<File> files) {
         this.files = files;
-    }
-    
-    public String getUserName() {
-        return userId;
-    }
-    
-    public void setUserName(String userId) {
-        this.userId = userId;
     }
     
     public Integer getExpiresIn() {
