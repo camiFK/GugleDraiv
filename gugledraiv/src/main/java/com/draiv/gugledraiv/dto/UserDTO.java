@@ -27,16 +27,16 @@ public class UserDTO {
         return token;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long setId(Long id) {
+        return this.id = id;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String setToken(String token) {
+        return this.token = token;
     }
 
     

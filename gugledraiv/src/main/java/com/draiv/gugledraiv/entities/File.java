@@ -25,8 +25,6 @@ public class File {
     @Column (name = "systemId")
     private String systemId;
 
-    private String path;
-
     // @Column(nullable = false)
     @Column (name = "isFolder")
     private Boolean isFolder;
