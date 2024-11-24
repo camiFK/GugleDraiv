@@ -20,9 +20,9 @@ public class FileService implements IFileService {
     private FileRepository fileRepository;
     @Autowired
     private FolderRepository folderRepository;
-
-    public List<File> GetAllFiles() {
-        return fileRepository.findAll();
+    @Override
+    public List<File> getAllFiles(String token, String systemId, String path) {
+        return fileRepository.findAllBySystemIdAndPath(systemId, path);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class FileService implements IFileService {
         return UUID.randomUUID().toString().toUpperCase().substring(0, 8);
     }
 
-    // Generar URL pública con fileHash
+    @Override// Generar URL pública con fileHash
     public String generatePublicUrl(String fileHash) {
         String baseUrl = "https://poo2024.unsada.edu.ar/draiv/";
         return baseUrl + fileHash;
@@ -55,16 +55,20 @@ public class FileService implements IFileService {
 
     // Guardar archivo con fileHash y URL pública
     public File saveFileWithHash(File file) {
-        String fileHash = generateFileHash();
-        file.setFileHash(fileHash);
-        String publicUrl = generatePublicUrl(fileHash);
+        if(file.getFileHash() == null) {
+            String fileHash = generateFileHash();
+            file.setFileHash(fileHash);
+        }
+        String publicUrl = generatePublicUrl(file.getFileHash());
         file.setFileURL(publicUrl);
         return fileRepository.save(file);
     }
+    private String storagePath;
 
+    @Override
     public Resource getFileByHash(String fileHash) {
         try {
-            Path filePath = Paths.get("http://localhost:8082/files/", fileHash);
+            Path filePath = Paths.get(storagePath, fileHash);
             Resource file = new UrlResource(filePath.toUri());
 
             if (Files.exists(filePath) && file.isReadable()) {
@@ -78,9 +82,9 @@ public class FileService implements IFileService {
         }
 
     }
-
-    public boolean isAuthenticated(String token) {
-        return "token_valido".equals(token);
+    @Override
+    public boolean isAuthenticated(String usertoken) {
+        return "token_valido".equals(usertoken);
     }
 
     public Map<String, String> createFileOrFolder(String systemId, boolean isFolder, String filePath, String fileExt,
@@ -98,7 +102,7 @@ public class FileService implements IFileService {
             file.setContent(content);
             file.setIsPublic(isPublic);
 
-            File savedFile = fileRepository.save(file);
+            File savedFile = saveFileWithHash(file);
             response.put("fileId", String.valueOf(savedFile.getId()));
 
             if (isPublic) {
@@ -112,6 +116,7 @@ public class FileService implements IFileService {
         return response;
     }
 
+    @Override
     public boolean deleteFileOrFolder(String fileId, String systemId) {
         Long id;
         try {
