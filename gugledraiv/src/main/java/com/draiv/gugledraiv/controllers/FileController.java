@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.draiv.gugledraiv.dto.FileDTO;
-import com.draiv.gugledraiv.entities.*;
-import com.draiv.gugledraiv.repositories.UserRepository;
 import com.draiv.gugledraiv.services.FileService;
 import com.draiv.gugledraiv.services.UserService;
 
@@ -28,6 +26,8 @@ import com.draiv.gugledraiv.services.UserService;
 public class FileController {
     @Autowired
     private FileService fileService;
+
+    @Autowired
     private UserService userService;
 
     public FileController(FileService fileService) {
@@ -40,6 +40,9 @@ public class FileController {
             @RequestParam String systemId,
             @RequestParam(required = false) String path) {
         try {
+            if(!userService.isAuthenticated(token)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+            }
 
             if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son parametros obligatorios.");
@@ -140,13 +143,17 @@ public class FileController {
         }
     }
 
+    //Endpoint para borrar un archivo/carpeta. En caso de que sea carpeta elimina todo su contenido.
     @DeleteMapping("/files/{fileId}")
     public  ResponseEntity<?> deleteFileOrFolder(
             @PathVariable String fileId,
-            @RequestBody Map<String, String> request) {
+            @RequestParam String token,
+            @RequestParam String systemId) {
         try {
-            String token = request.get("token");
-            String systemId = request.get("systemId");
+
+            if(!userService.isAuthenticated(token)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado.");
+            }
 
             if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
@@ -157,7 +164,7 @@ public class FileController {
             if (deleted) {
                 return ResponseEntity.ok(Map.of(
                         "fileId", fileId,
-                        "message", "Archivo/Carpeta eliminado correctamente"
+                        "message", "Archivo/Carpeta eliminado correctamente."
                 ));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(

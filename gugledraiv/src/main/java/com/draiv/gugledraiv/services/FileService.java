@@ -24,6 +24,9 @@ public class FileService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     public FileService(UserRepository userRepository, FileRepository fileRepository) {
         this.userRepository = userRepository;
         this.fileRepository = fileRepository;
@@ -168,8 +171,10 @@ public class FileService {
         if (toDeleteFile.isPresent()) {
             File file = toDeleteFile.get();
    
-            if (file.isFolder) {
-                fileRepository.deleteAll(file.getChildren());
+            if (file.getIsFolder()) {
+                for (File child : file.getChildren()) {
+                    deleteFileOrFolder(child.getId(), systemId);  // Llamada recursiva
+                }
             }
     
             fileRepository.delete(file);
