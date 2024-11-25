@@ -16,17 +16,17 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userId")
     private Long userId;
-
-    @Column(name = "userName")
-    private String userName;
-
-    @Column(name = "token")
+ 
+    @Column(name = "token", unique = true, nullable = false)
     private String token;
 
-    //Relaciom con File
+    @Column(name = "expiresIn")
+    private Integer expiresIn;
+
+    //Relacion con File
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<File> files;
-
+    
     public Users() {
     }
 
@@ -49,18 +49,16 @@ public class Users {
     public List<File> getFiles() {
         return files;
     }
-
+    
     public void setFiles(List<File> files) {
         this.files = files;
     }
-
-    public String getUserName() {
-        return userName;
+    
+    public Integer getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
     }
-
-
 }

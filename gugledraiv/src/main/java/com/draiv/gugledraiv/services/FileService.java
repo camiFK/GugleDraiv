@@ -3,63 +3,94 @@ package com.draiv.gugledraiv.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.draiv.gugledraiv.repositories.*;
+import com.draiv.gugledraiv.dto.FileDTO;
+import com.draiv.gugledraiv.dto.FileRequest;
+import com.draiv.gugledraiv.dto.FileResponse;
 import com.draiv.gugledraiv.entities.*;
-import com.draiv.gugledraiv.interfaces.IFileService;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.nio.file.Files;
 
 @Service
-public class FileService implements IFileService {
+public class FileService {
 
     @Autowired
     private FileRepository fileRepository;
+
     @Autowired
-    private FolderRepository folderRepository;
+    private UserRepository userRepository;
 
-    public List<File> GetAllFiles() {
-        return fileRepository.findAll();
+    @Autowired
+    private UserService userService;
+
+    public FileService(UserRepository userRepository, FileRepository fileRepository) {
+        this.userRepository = userRepository;
+        this.fileRepository = fileRepository;
     }
 
-    @Override
-    public File GetFileById(Long id) {
-        return fileRepository.findById(id).orElse(null);
-        /*
-         * .orElseThrow(() -> new
-         * NoSuchElementException("No se encontro el archivo con el ID:  " + id));
-         */
+    public List<FileDTO> getFiles(String token, String systemId, String path) {
+
+        Users user = userRepository.findByToken(token);
+
+        if (user == null) {
+            throw new NoSuchElementException("No se encontro el usuario");
+        }
+
+        List<File> files;
+        if (path != null && !path.isEmpty()) {
+            files = fileRepository.findByUser_UserIdAndFilePath(user.getUserId(), path);
+        } else {
+            files = fileRepository.findByUser_UserId(user.getUserId());
+        }
+
+        return files.stream().map(file -> new FileDTO(
+                file.getId(),
+                file.getIsFolder(),
+                file.getFilePath(),
+                file.getFileExt(),
+                file.getFileName(),
+                file.getMimeType(),
+                file.getContent(),
+                file.getIsPublic(),
+                file.getFileURL())).collect(Collectors.toList());
     }
 
-    public File saveFile(File file) {
-        return fileRepository.save(file);
+    public FileDTO getFileById(Long fileId, String token) {
+
+        Users user = userRepository.findByToken(token);
+
+        if (user == null) {
+            throw new NoSuchElementException("No se encontro el usuario");
+        }
+
+        File file = fileRepository.findByUser_UserIdAndId(user.getUserId(), fileId);
+
+        FileDTO fileDTO = mapToFileDTO(file);
+
+        return fileDTO;
     }
 
-    // public File getAllFilesByUserId(Long userId) {
-    // return fileRepository.findById(userId).get();
-    // }
-
-    // Generar UUID
-    public String generateFileHash() {
-        return UUID.randomUUID().toString().toUpperCase().substring(0, 8);
-    }
-
-    // Generar URL pública con fileHash
-    public String generatePublicUrl(String fileHash) {
-        String baseUrl = "https://poo2024.unsada.edu.ar/draiv/";
-        return baseUrl + fileHash;
-    }
-
-    // Guardar archivo con fileHash y URL pública
-    public File saveFileWithHash(File file) {
-        String fileHash = generateFileHash();
-        file.setFileHash(fileHash);
-        String publicUrl = generatePublicUrl(fileHash);
-        file.setFileURL(publicUrl);
-        return fileRepository.save(file);
+    private FileDTO mapToFileDTO(File file) {
+        FileDTO dto = new FileDTO();
+        dto.setId(file.getId());
+        dto.setIsFolder(file.getIsFolder());
+        dto.setFilePath(file.getFilePath());
+        dto.setFileExt(file.getFileExt());
+        dto.setFileName(file.getFileName());
+        dto.setMimeType(file.getIsFolder() ? null : file.getMimeType());
+        dto.setContent(file.getIsFolder() ? null : file.getContent());
+        dto.setIsPublic(file.getIsPublic());
+        dto.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
+        return dto;
     }
 
     public Resource getFileByHash(String fileHash) {
@@ -79,60 +110,104 @@ public class FileService implements IFileService {
 
     }
 
-    public boolean isAuthenticated(String token) {
-        return "token_valido".equals(token);
-    }
-
-    public Map<String, String> createFileOrFolder(String systemId, boolean isFolder, String filePath, String fileExt,
-            String fileName, String mimeType, String content, boolean isPublic) {
-            Map<String, String> response = new HashMap<>();
-
-        try {
-            File file = new File();
-            file.setSystemId(systemId);
-            file.setIsFolder(isFolder);
-            file.setFilePath(filePath);
-            file.setFileName(fileExt);
-            file.setFileName(fileName);
-            file.setMimeType(mimeType);
-            file.setContent(content);
-            file.setIsPublic(isPublic);
-
-            File savedFile = fileRepository.save(file);
-            response.put("fileId", String.valueOf(savedFile.getId()));
-
-            if (isPublic) {
-                response.put("fileURL", "https://poo2024.unsada.edu.ar/draiv/" + savedFile.getId());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public FileResponse createFileOrFolder(FileRequest fileRequest) {
+        Users user = userRepository.findByToken(fileRequest.getToken());
+        if (user == null) {
+            throw new IllegalArgumentException("Token inválido o usuario no encontrado.");
         }
+
+        boolean isValid = isValidFileOrFolder(fileRequest);
+
+        if (!isValid) {
+            throw new IllegalArgumentException("El archivo/carpeta no es valido. Faltan parametros.");
+        }
+
+        File file = new File();
+        file.setSystemId(fileRequest.getSystemId());
+        file.setUser(user);
+        file.setIsFolder(fileRequest.getIsFolder());
+        file.setFilePath(fileRequest.getFilePath());
+        file.setFileName(fileRequest.getFileName());
+        file.setFileExt(fileRequest.getIsFolder() ? null : fileRequest.getFileExt());
+        file.setMimeType(fileRequest.getIsFolder() ? null : fileRequest.getMimeType());
+        file.setIsPublic(fileRequest.getIsPublic());
+        file.setUploadDate(LocalDateTime.now());
+
+        if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
+            String base64Content = Base64.getEncoder().encodeToString(fileRequest.getContent().getBytes());
+            file.setContent(base64Content);
+        
+            String fileHash = generateFileHash(fileRequest.getContent());
+            file.setFileHash(fileHash);
+        } else {
+            file.setContent(null);
+            file.setFileHash(null);
+        }     
+
+        if (!file.getIsFolder() && fileRequest.getIsPublic()) {
+            String fileURL = generateFileURL(fileRequest);
+            file.setFileURL(fileURL);
+        }
+
+        file = fileRepository.save(file);
+
+        FileResponse response = new FileResponse();
+        response.setFileId(file.getId().toString());
+        response.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
 
         return response;
     }
 
-    public boolean deleteFileOrFolder(String fileId, String systemId) {
-        Long id;
-        try {
-            id = Long.parseLong(fileId);
-        } catch (NumberFormatException e) {
+    private boolean isValidFileOrFolder(FileRequest fileRequest) {
+        if (fileRequest == null) {
             return false;
         }
 
-        Optional<Folder> folderOptional = folderRepository.findById(id);
-        if (folderOptional.isPresent()) {
-            Folder folder = folderOptional.get();
-            folderRepository.delete(folder);
-            return true;
+        if (fileRequest.getFileName() == null || fileRequest.getFileName().trim().isEmpty()) {
+            return false;
         }
 
-        Optional<File> fileOptional = fileRepository.findById(id);
-        if (fileOptional.isPresent()) {
-            File file = fileOptional.get();
-            if (!file.getSystemId().equals(systemId)) {
-                return false;
+        if (fileRequest.getIsFolder() == null) {
+            return false;
+        }
+
+        if (fileRequest.getFilePath() == null || fileRequest.getFilePath().trim().isEmpty()) {
+            return false;
+        }
+
+        if (fileRequest.getIsPublic() == null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private String generateFileHash(String content) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(content.getBytes());
+            return Base64.getEncoder().encodeToString(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al calcular el hash del archivo", e);
+        }
+    }
+
+    private String generateFileURL(FileRequest file) {
+        return "http://localhost:8082/files/" + file.getFileName();
+    }
+
+    public boolean deleteFileOrFolder(Long fileId, String systemId) {
+
+        Optional<File> toDeleteFile = fileRepository.findById(fileId);
+        if (toDeleteFile.isPresent()) {
+            File file = toDeleteFile.get();
+
+            if (file.getIsFolder()) {
+                for (File child : file.getChildren()) {
+                    deleteFileOrFolder(child.getId(), systemId); // Llamada recursiva
+                }
             }
+
             fileRepository.delete(file);
             return true;
         }
