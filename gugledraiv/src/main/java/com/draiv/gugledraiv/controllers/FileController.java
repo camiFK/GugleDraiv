@@ -1,5 +1,6 @@
 package com.draiv.gugledraiv.controllers;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.draiv.gugledraiv.dto.FileDTO;
 import com.draiv.gugledraiv.dto.FileRequest;
 import com.draiv.gugledraiv.dto.FileResponse;
+import com.draiv.gugledraiv.entities.File;
 import com.draiv.gugledraiv.services.FileService;
 import com.draiv.gugledraiv.services.UserService;
 
@@ -93,6 +96,38 @@ public class FileController {
 
     // Endpoint para descargar un archivo
     @GetMapping("/download/{fileHash}")
+    public ResponseEntity<?> downloadFile(@PathVariable String fileHash) {
+        try {
+            File file = fileService.getFileByFileHash(fileHash);
+
+            if (file == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                        "message", "No existe el archivo solicitado."));
+            }
+
+            if(file.getIsFolder()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "message", "El archivo solicitado es una carpeta, no puede descargarse"));
+            }
+
+            byte[] decodedFileContent = Base64.getDecoder().decode(file.getContent());
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=" + file.getFileName());
+
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(decodedFileContent.length)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)  
+                .body(decodedFileContent); 
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "message", "Ocurrió un error al procesar la solicitud."));
+        }
+    }
+
+    /* @GetMapping("/download/{fileHash}")
     public ResponseEntity<Object> downloadFile(@PathVariable String fileHash) {
         try {
             Resource file = fileService.getFileByHash(fileHash);
@@ -107,7 +142,7 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "message", "Ocurrió un error al procesar la solicitud."));
         }
-    }
+    } */
 
     @PostMapping("/files")
     public ResponseEntity<?> createFileOrFolder(@RequestBody FileRequest fileRequest) {

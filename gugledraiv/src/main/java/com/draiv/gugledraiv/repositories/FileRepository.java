@@ -12,7 +12,7 @@ import com.draiv.gugledraiv.entities.*;
 public interface FileRepository extends JpaRepository<File, Long> {
     List<File> findByFolder(File folder);
 
-    Optional<File> findByFileHash(String fileHash); 
+    File findByFileHash(String fileHash); 
 
     List<File> findByUser_UserId(Long userId);
 

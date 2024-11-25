@@ -110,6 +110,10 @@ public class FileService {
 
     }
 
+    public File getFileByFileHash(String fileHash){
+        return fileRepository.findByFileHash(fileHash);
+    }
+
     public FileResponse createFileOrFolder(FileRequest fileRequest) {
         Users user = userRepository.findByToken(fileRequest.getToken());
         if (user == null) {
