@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.draiv.gugledraiv.repositories.*;
 import com.draiv.gugledraiv.dto.FileDTO;
+import com.draiv.gugledraiv.dto.FileRequest;
+import com.draiv.gugledraiv.dto.FileResponse;
 import com.draiv.gugledraiv.entities.*;
 
 import java.util.*;
@@ -13,6 +15,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.nio.file.Files;
 
 @Service
@@ -82,7 +87,7 @@ public class FileService {
         dto.setFileExt(file.getFileExt());
         dto.setFileName(file.getFileName());
         dto.setMimeType(file.getIsFolder() ? null : file.getMimeType());
-        dto.setContent(file.getIsFolder() ? null : file.getContent()); 
+        dto.setContent(file.getIsFolder() ? null : file.getContent());
         dto.setIsPublic(file.getIsPublic());
         dto.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
         return dto;
@@ -129,58 +134,108 @@ public class FileService {
 
     }
 
-    public Map<String, String> createFileOrFolder(
-            String systemId,
-            boolean isFolder,
-            String filePath,
-            String fileExt,
-            String fileName,
-            String mimeType,
-            String content,
-            boolean isPublic) {
-        Map<String, String> response = new HashMap<>();
-
-        try {
-            File file = new File();
-            file.setSystemId(systemId);
-            file.setIsFolder(isFolder);
-            file.setFilePath(filePath);
-            file.setFileName(fileExt);
-            file.setFileName(fileName);
-            file.setMimeType(mimeType);
-            file.setContent(content);
-            file.setIsPublic(isPublic);
-
-            File savedFile = fileRepository.save(file);
-            response.put("fileId", String.valueOf(savedFile.getId()));
-
-            if (isPublic) {
-                response.put("fileURL", "https://poo2024.unsada.edu.ar/draiv/" + savedFile.getId());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public FileResponse createFileOrFolder(FileRequest fileRequest) {
+        Users user = userRepository.findByToken(fileRequest.getToken());
+        if (user == null) {
+            throw new IllegalArgumentException("Token inválido o usuario no encontrado.");
         }
+
+        boolean isValid = isValidFileOrFolder(fileRequest);
+
+        if (!isValid) {
+            throw new IllegalArgumentException("El archivo/carpeta no es valido. Faltan parametros.");
+        }
+
+        File file = new File();
+        file.setSystemId(fileRequest.getSystemId());
+        file.setUser(user);
+        file.setIsFolder(fileRequest.getIsFolder());
+        file.setFilePath(fileRequest.getFilePath());
+        file.setFileName(fileRequest.getFileName());
+        file.setFileExt(fileRequest.getIsFolder() ? null : fileRequest.getFileExt());
+        file.setMimeType(fileRequest.getIsFolder() ? null : fileRequest.getMimeType());
+        file.setIsPublic(fileRequest.getIsPublic());
+        file.setUploadDate(LocalDateTime.now());
+
+        if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
+            String base64Content = Base64.getEncoder().encodeToString(fileRequest.getContent().getBytes());
+            file.setContent(base64Content);
+        
+            String fileHash = generateFileHash(fileRequest.getContent());
+            file.setFileHash(fileHash);
+        } else {
+            file.setContent(null);
+            file.setFileHash(null);
+        }     
+
+        if (!file.getIsFolder() && fileRequest.getIsPublic()) {
+            String fileURL = generateFileURL(fileRequest);
+            file.setFileURL(fileURL);
+        }
+
+        file = fileRepository.save(file);
+
+        FileResponse response = new FileResponse();
+        response.setFileId(file.getId().toString());
+        response.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
 
         return response;
     }
 
+    private boolean isValidFileOrFolder(FileRequest fileRequest) {
+        if (fileRequest == null) {
+            return false;
+        }
+
+        if (fileRequest.getFileName() == null || fileRequest.getFileName().trim().isEmpty()) {
+            return false;
+        }
+
+        if (fileRequest.getIsFolder() == null) {
+            return false;
+        }
+
+        if (fileRequest.getFilePath() == null || fileRequest.getFilePath().trim().isEmpty()) {
+            return false;
+        }
+
+        if (fileRequest.getIsPublic() == null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private String generateFileHash(String content) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(content.getBytes());
+            return Base64.getEncoder().encodeToString(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al calcular el hash del archivo", e);
+        }
+    }
+
+    private String generateFileURL(FileRequest file) {
+        return "http://localhost:8082/files/" + file.getFileName();
+    }
+
     public boolean deleteFileOrFolder(Long fileId, String systemId) {
-    
+
         Optional<File> toDeleteFile = fileRepository.findById(fileId);
         if (toDeleteFile.isPresent()) {
             File file = toDeleteFile.get();
-   
+
             if (file.getIsFolder()) {
                 for (File child : file.getChildren()) {
-                    deleteFileOrFolder(child.getId(), systemId);  // Llamada recursiva
+                    deleteFileOrFolder(child.getId(), systemId); // Llamada recursiva
                 }
             }
-    
+
             fileRepository.delete(file);
             return true;
         }
-    
-        return false; 
+
+        return false;
     }
 }
