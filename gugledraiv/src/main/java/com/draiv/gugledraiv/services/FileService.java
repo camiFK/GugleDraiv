@@ -93,30 +93,6 @@ public class FileService {
         return dto;
     }
 
-    public File saveFile(File file) {
-        return fileRepository.save(file);
-    }
-
-    // Generar UUID
-    public String generateFileHash() {
-        return UUID.randomUUID().toString().toUpperCase().substring(0, 8);
-    }
-
-    // Generar URL pública con fileHash
-    public String generatePublicUrl(String fileHash) {
-        String baseUrl = "https://poo2024.unsada.edu.ar/draiv/";
-        return baseUrl + fileHash;
-    }
-
-    // Guardar archivo con fileHash y URL pública
-    public File saveFileWithHash(File file) {
-        String fileHash = generateFileHash();
-        file.setFileHash(fileHash);
-        String publicUrl = generatePublicUrl(fileHash);
-        file.setFileURL(publicUrl);
-        return fileRepository.save(file);
-    }
-
     public Resource getFileByHash(String fileHash) {
         try {
             Path filePath = Paths.get("http://localhost:8082/files/", fileHash);

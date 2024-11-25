@@ -91,17 +91,6 @@ public class FileController {
         }
     }
 
-    @GetMapping("/{fileHash}")
-    public ResponseEntity<?> getFilePublicUrl(@PathVariable String fileHash) {
-        Resource fileResource = fileService.getFileByHash(fileHash);
-        if (fileResource != null) {
-            String publicUrl = fileService.generatePublicUrl(fileHash);
-            return ResponseEntity.ok(publicUrl);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Archivo no encontrado.");
-        }
-    }
-
     // Endpoint para descargar un archivo
     @GetMapping("/download/{fileHash}")
     public ResponseEntity<Object> downloadFile(@PathVariable String fileHash) {
