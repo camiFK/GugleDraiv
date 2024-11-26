@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.draiv.gugledraiv.dto.UserDTO;
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.repositories.UserRepository;
+import com.draiv.gugledraiv.services.UserService;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -23,6 +25,9 @@ public class UsersController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
