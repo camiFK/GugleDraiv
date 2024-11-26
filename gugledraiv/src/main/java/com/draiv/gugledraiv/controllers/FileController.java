@@ -75,22 +75,26 @@ public class FileController {
             @RequestParam String token,
             @RequestParam String systemId) {
         try {
+            if (!userService.isAuthenticated(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+            }
+
             if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Token y systemId son obligatorios."));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
             }
 
             FileDTO fileDTO = fileService.getFileById(fileId, token);
 
             if (fileDTO == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No existe el archivo/carpeta indicado."));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el archivo/carpeta indicado.");
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(fileDTO);
             }
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No autenticado"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No existe el path indicado"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el path indicado");
         }
     }
 
@@ -126,23 +130,6 @@ public class FileController {
                     "message", "Ocurrió un error al procesar la solicitud."));
         }
     }
-
-    /* @GetMapping("/download/{fileHash}")
-    public ResponseEntity<Object> downloadFile(@PathVariable String fileHash) {
-        try {
-            Resource file = fileService.getFileByHash(fileHash);
-            if (file == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                        "message", "No existe el archivo solicitado."));
-            }
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                    .body(file);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Ocurrió un error al procesar la solicitud."));
-        }
-    } */
 
     @PostMapping("/files")
     public ResponseEntity<?> createFileOrFolder(@RequestBody FileRequest fileRequest) {
