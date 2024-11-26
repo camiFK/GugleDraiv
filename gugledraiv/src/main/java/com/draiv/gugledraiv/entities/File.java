@@ -28,6 +28,7 @@ public class File {
     @Column (name = "mimeType")
     private String mimeType;
 
+    @Lob
     @Column (name = "content")
     private String content;
 
