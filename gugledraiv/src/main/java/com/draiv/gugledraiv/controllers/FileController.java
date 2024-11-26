@@ -76,21 +76,21 @@ public class FileController {
             @RequestParam String systemId) {
         try {
             if (token == null || token.isEmpty() || systemId == null || systemId.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Token y systemId son obligatorios."));
             }
 
             FileDTO fileDTO = fileService.getFileById(fileId, token);
 
             if (fileDTO == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el archivo/carpeta indicado.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No existe el archivo/carpeta indicado."));
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(fileDTO);
             }
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No autenticado"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No existe el path indicado"));
         }
     }
 
