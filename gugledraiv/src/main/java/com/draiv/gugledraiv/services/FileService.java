@@ -48,6 +48,9 @@ public class FileService {
         List<File> files;
         if (path != null && !path.isEmpty()) {
             files = fileRepository.findByUser_UserIdAndFilePath(user.getUserId(), path);
+            if (files == null) {
+                throw new NoSuchElementException("No se encontraron archivos en el path indicado.");
+            }
         } else {
             files = fileRepository.findByUser_UserId(user.getUserId());
         }

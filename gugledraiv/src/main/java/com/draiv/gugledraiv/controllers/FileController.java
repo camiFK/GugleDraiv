@@ -56,11 +56,7 @@ public class FileController {
 
             List<FileDTO> files = fileService.getFiles(token, systemId, path);
 
-            if (files == null || files.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el path indicado.");
-            } else {
-                return ResponseEntity.status(HttpStatus.OK).body(files);
-            }
+            return ResponseEntity.status(HttpStatus.OK).body(files);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
