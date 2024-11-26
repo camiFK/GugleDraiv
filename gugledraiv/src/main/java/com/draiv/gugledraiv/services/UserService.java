@@ -27,4 +27,20 @@ public class UserService {
         return true;
     }
 
+
+    public boolean deleteUserByToken(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("El token no puede ser nulo o vacío.");
+        }
+    
+        Users user = userRepository.findByToken(token);
+        if (user != null) {
+            userRepository.delete(user);
+            return true;
+        }
+        return false;
+    }
+    
+
+
 }
