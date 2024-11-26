@@ -47,19 +47,4 @@ public class UsersController {
                 .status(HttpStatus.CREATED)
                 .body("Usuario guardado con ID: " + savedUser.getUserId());
     } 
-
-    @PostMapping("/user/logout")
-    public ResponseEntity<String> deleteUser(@RequestBody String token){
-        try{
-            boolean isDeleted = userService.deleteUserByToken(token);
-            if (isDeleted){
-                return ResponseEntity.ok("Usuario eliminado exitosamente."); //Muestra un mensaje si el usuario se elimina de forma correcta
-            } else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
-
-            } 
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el usuario.");
-        }
-    }
 } 
