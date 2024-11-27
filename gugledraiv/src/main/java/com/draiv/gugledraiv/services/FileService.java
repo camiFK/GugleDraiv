@@ -119,8 +119,8 @@ public class FileService {
 
     }
 
-    public File getFileByFileHash(String Id){
-        return fileRepository.findById(Id);
+    public File getFileByFileHash(String fileHash){
+        return fileRepository.findByFileHash(fileHash);
     }
 
     public FileResponse createFileOrFolder(FileRequest fileRequest) {
