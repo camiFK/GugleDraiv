@@ -27,7 +27,7 @@ import com.draiv.gugledraiv.services.FileService;
 import com.draiv.gugledraiv.services.UserService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class FileController {
     @Autowired
     private FileService fileService;
