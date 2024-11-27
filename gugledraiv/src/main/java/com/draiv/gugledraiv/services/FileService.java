@@ -69,7 +69,8 @@ public class FileService {
                 file.getMimeType(),
                 file.getContent(),
                 file.getIsPublic(),
-                file.getFileURL())).collect(Collectors.toList());
+                file.getFileURL(),
+                file.getFileHash())).collect(Collectors.toList());
     }
 
     public FileDTO getFileById(Long fileId, String token) {

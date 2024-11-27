@@ -6,17 +6,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.draiv.gugledraiv.dto.UserDTO;
 import com.draiv.gugledraiv.entities.*;
 import com.draiv.gugledraiv.repositories.UserRepository;
 import com.draiv.gugledraiv.services.UserService;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -53,8 +49,8 @@ public class UsersController {
                 .body("Usuario guardado con ID: " + savedUser.getUserId());
     } 
 
-    @PostMapping("/users/logout")
-    public ResponseEntity<String> deleteUser(@RequestBody String token) {
+    @DeleteMapping("/users/logout")
+    public ResponseEntity<String> deleteUser(@RequestParam String token) {
         try {
         boolean isDeleted = userService.deleteUserByToken(token);
         if (isDeleted) {
