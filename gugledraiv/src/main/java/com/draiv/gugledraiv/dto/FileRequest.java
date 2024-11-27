@@ -11,7 +11,14 @@ public class FileRequest {
     private String mimeType;
     private String content;
     private Boolean isPublic;
+    private Long folderId;
     
+    public Long getFolderId() {
+        return folderId;
+    }
+    public void setFolderId(Long folderId) {
+        this.folderId = folderId;
+    }
     public String getToken() {
         return token;
     }

@@ -32,15 +32,14 @@ public class UserService {
         if (token == null || token.isEmpty()) {
             throw new IllegalArgumentException("El token no puede ser nulo o vacío.");
         }
-    
+        token = token.trim();
         Users user = userRepository.findByToken(token);
-        if (user != null) {
+        if (user == null) {
+            throw new IllegalStateException("El token no corresponde a ningún usuario.");
+        } else {
             userRepository.delete(user);
             return true;
         }
-        return false;
     }
     
-
-
 }

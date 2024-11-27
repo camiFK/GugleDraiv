@@ -1,24 +1,29 @@
 package com.draiv.gugledraiv.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.draiv.gugledraiv.repositories.*;
-import com.draiv.gugledraiv.dto.FileDTO;
-import com.draiv.gugledraiv.dto.FileRequest;
-import com.draiv.gugledraiv.dto.FileResponse;
-import com.draiv.gugledraiv.entities.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.nio.file.Files;
+import java.util.Base64;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+
+import com.draiv.gugledraiv.dto.FileDTO;
+import com.draiv.gugledraiv.dto.FileRequest;
+import com.draiv.gugledraiv.dto.FileResponse;
+import com.draiv.gugledraiv.entities.File;
+import com.draiv.gugledraiv.entities.Users;
+import com.draiv.gugledraiv.repositories.FileRepository;
+import com.draiv.gugledraiv.repositories.UserRepository;
 
 @Service
 public class FileService {
@@ -64,7 +69,8 @@ public class FileService {
                 file.getMimeType(),
                 file.getContent(),
                 file.getIsPublic(),
-                file.getFileURL())).collect(Collectors.toList());
+                file.getFileURL(),
+                file.getFileHash())).collect(Collectors.toList());
     }
 
     public FileDTO getFileById(Long fileId, String token) {
@@ -113,8 +119,8 @@ public class FileService {
 
     }
 
-    public File getFileByFileHash(String fileHash){
-        return fileRepository.findByFileHash(fileHash);
+    public File getFileByFileHash(String Id){
+        return fileRepository.findById(Id);
     }
 
     public FileResponse createFileOrFolder(FileRequest fileRequest) {
@@ -140,12 +146,21 @@ public class FileService {
         file.setIsPublic(fileRequest.getIsPublic());
         file.setUploadDate(LocalDateTime.now());
 
+        if (!fileRequest.getIsFolder() && fileRequest.getFolderId() != null) {
+            File folder = fileRepository.findById(fileRequest.getFolderId())
+                    .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
+            file.setFolder(folder); 
+        }
+
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
+
             String base64Content = fileRequest.getContent();
             file.setContent(base64Content);
-
-            String fileHash = generateFileHash(base64Content);
+             
+            byte[] contentBytes = Base64.getDecoder().decode(base64Content);
+            String fileHash = generateFileHash(contentBytes); 
             file.setFileHash(fileHash);
+
         } else {
             file.setContent(null);
             file.setFileHash(null);
@@ -189,12 +204,11 @@ public class FileService {
         return true;
     }
 
-    private String generateFileHash(String base64Content) {
+    private String generateFileHash(byte[] contentBytes) {
         try {
-            byte[] contentBytes = Base64.getDecoder().decode(base64Content);
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(contentBytes);
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(encodedHash);
+            return Base64.getEncoder().encodeToString(encodedHash);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error al calcular el hash del archivo", e);
         }
