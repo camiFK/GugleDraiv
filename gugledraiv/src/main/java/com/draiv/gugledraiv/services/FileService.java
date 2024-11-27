@@ -119,8 +119,8 @@ public class FileService {
 
     }
 
-    public File getFileByFileHash(String fileHash){
-        return fileRepository.findByFileHash(fileHash);
+    public File getFileByFileHash(String Id){
+        return fileRepository.findById(Id);
     }
 
     public FileResponse createFileOrFolder(FileRequest fileRequest) {
@@ -145,6 +145,12 @@ public class FileService {
         file.setMimeType(fileRequest.getIsFolder() ? null : fileRequest.getMimeType());
         file.setIsPublic(fileRequest.getIsPublic());
         file.setUploadDate(LocalDateTime.now());
+
+        if (!fileRequest.getIsFolder() && fileRequest.getFolderId() != null) {
+            File folder = fileRepository.findById(fileRequest.getFolderId())
+                    .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
+            file.setFolder(folder); 
+        }
 
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
 
