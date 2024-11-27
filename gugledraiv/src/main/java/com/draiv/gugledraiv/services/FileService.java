@@ -146,11 +146,11 @@ public class FileService {
         file.setIsPublic(fileRequest.getIsPublic());
         file.setUploadDate(LocalDateTime.now());
 
-        if (!fileRequest.getIsFolder() && fileRequest.getFolderId() != null) {
-            File folder = fileRepository.findById(fileRequest.getFolderId())
-                    .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
-            file.setFolder(folder); 
-        }
+        // if (!fileRequest.getIsFolder() && fileRequest.getFolderId() != null) {
+        //     File folder = fileRepository.findById(fileRequest.getFolderId())
+        //             .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
+        //     file.setFolder(folder); 
+        // }
 
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
 
