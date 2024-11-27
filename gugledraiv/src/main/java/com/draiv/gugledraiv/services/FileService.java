@@ -141,10 +141,10 @@ public class FileService {
         file.setUploadDate(LocalDateTime.now());
 
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
-            String base64Content = Base64.getEncoder().encodeToString(fileRequest.getContent().getBytes());
+            String base64Content = fileRequest.getContent();
             file.setContent(base64Content);
-        
-            String fileHash = generateFileHash(fileRequest.getContent());
+
+            String fileHash = generateFileHash(base64Content);
             file.setFileHash(fileHash);
         } else {
             file.setContent(null);
@@ -189,11 +189,12 @@ public class FileService {
         return true;
     }
 
-    private String generateFileHash(String content) {
+    private String generateFileHash(String base64Content) {
         try {
+            byte[] contentBytes = Base64.getDecoder().decode(base64Content);
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(content.getBytes());
-            return Base64.getEncoder().encodeToString(encodedHash);
+            byte[] encodedHash = digest.digest(contentBytes);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(encodedHash);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error al calcular el hash del archivo", e);
         }
