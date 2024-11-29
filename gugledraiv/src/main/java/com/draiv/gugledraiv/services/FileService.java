@@ -146,6 +146,18 @@ public class FileService {
         file.setIsPublic(fileRequest.getIsPublic());
         file.setUploadDate(LocalDateTime.now());
 
+        //Asignar archivo a su carpeta padre 
+        if(fileRequest.getFolderId() != null){
+            File parentFolder = fileRepository.findById(fileRequest.getFolderId())
+                .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
+
+            if(!parentFolder.getIsFolder()){
+                throw new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId());
+            }
+
+            file.setFolder(parentFolder);
+        }
+
         // if (!fileRequest.getIsFolder() && fileRequest.getFolderId() != null) {
         //     File folder = fileRepository.findById(fileRequest.getFolderId())
         //             .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));

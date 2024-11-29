@@ -1,6 +1,7 @@
 package com.draiv.gugledraiv.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -43,7 +44,7 @@ public class File {
     @Column (name = "content", columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(name = "fileHash", unique = true)
+    @Column(name = "fileHash")
     private String fileHash;
 
     @Column (name = "uploadDate", nullable = false)
@@ -63,12 +64,26 @@ public class File {
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<File> children;
 
-    
     //Relaacion con Users
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private Users user;
 
+    public File(){
+        this.children = new ArrayList<>();
+    }
+
+    public File getFolder(){
+        return folder;
+    }
+
+    public void setFolder(File folder){
+        this.folder = folder;
+        if(folder != null){
+            folder.getChildren().add(this);
+        }
+    }
+    
     public Long getId() {
         return id;
     }
@@ -180,4 +195,6 @@ public class File {
     public void setChildren(List<File> children) {
         this.children = children;
     }
+
+
 }
