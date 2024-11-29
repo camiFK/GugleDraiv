@@ -222,7 +222,7 @@ public class FileService {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(contentBytes);
-            return Base64.getEncoder().encodeToString(encodedHash);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(encodedHash);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error al calcular el hash del archivo", e);
         }
