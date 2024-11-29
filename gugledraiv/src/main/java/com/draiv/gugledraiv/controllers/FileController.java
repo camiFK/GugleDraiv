@@ -4,11 +4,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -111,14 +110,24 @@ public class FileController {
             }
 
             byte[] decodedFileContent = Base64.getDecoder().decode(file.getContent());
-            
+
+            Tika tika = new Tika();
+            String mimeType = tika.detect(decodedFileContent);
+
+            /* if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE; 
+            } */
+
+            String fileName = file.getFileName();
+
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=" + file.getFileName());
+            headers.add("Content-Disposition", "attachment; filename=" + fileName);
+            headers.add("Content-Type", mimeType);
 
             return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(decodedFileContent.length)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)  
+                // .contentType(MediaType.APPLICATION_OCTET_STREAM)  
                 .body(decodedFileContent); 
 
         } catch (Exception e) {
