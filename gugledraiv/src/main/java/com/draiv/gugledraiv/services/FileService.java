@@ -25,6 +25,8 @@ import com.draiv.gugledraiv.entities.Users;
 import com.draiv.gugledraiv.repositories.FileRepository;
 import com.draiv.gugledraiv.repositories.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class FileService {
 
@@ -149,10 +151,10 @@ public class FileService {
         //Asignar archivo a su carpeta padre 
         if(fileRequest.getFolderId() != null){
             File parentFolder = fileRepository.findById(fileRequest.getFolderId())
-                .orElseThrow(() -> new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
+                .orElseThrow(() -> new EntityNotFoundException("Carpeta no encontrada con id: " + fileRequest.getFolderId()));
 
             if(!parentFolder.getIsFolder()){
-                throw new IllegalArgumentException("Carpeta no encontrada con id: " + fileRequest.getFolderId());
+                throw new EntityNotFoundException("Carpeta no encontrada con id: " + fileRequest.getFolderId());
             }
 
             file.setFolder(parentFolder);
