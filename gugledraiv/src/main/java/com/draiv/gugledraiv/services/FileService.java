@@ -1,12 +1,12 @@
 package com.draiv.gugledraiv.services;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -166,24 +166,32 @@ public class FileService {
         //     file.setFolder(folder); 
         // }
 
+        //content
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
-
             String base64Content = fileRequest.getContent();
             file.setContent(base64Content);
-             
-            byte[] contentBytes = Base64.getDecoder().decode(base64Content);
-            String fileHash = generateFileHash(contentBytes); 
-            file.setFileHash(fileHash);
+        } else {
+            file.setContent(null);
+        }
 
+        //fileUrl
+        if (!file.getIsFolder() && fileRequest.getIsPublic()) {
+            String fileURL = generateFileURL(fileRequest);
+            file.setFileURL(fileURL);
+        }else{
+            file.setFileURL(null);
+        }
+
+        file = fileRepository.save(file);
+
+        //fileHash
+        if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
+            String fileHash = generateFileHash(file.getId().toString());
+            file.setFileHash(fileHash);
         } else {
             file.setContent(null);
             file.setFileHash(null);
         }     
-
-        if (!file.getIsFolder() && fileRequest.getIsPublic()) {
-            String fileURL = generateFileURL(fileRequest);
-            file.setFileURL(fileURL);
-        }
 
         file = fileRepository.save(file);
 
@@ -218,11 +226,21 @@ public class FileService {
         return true;
     }
 
-    private String generateFileHash(byte[] contentBytes) {
+    private String generateFileHash(String fileId) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(contentBytes);
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(encodedHash);
+            byte[] encodedHash = digest.digest(fileId.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+        
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error al calcular el hash del archivo", e);
         }
