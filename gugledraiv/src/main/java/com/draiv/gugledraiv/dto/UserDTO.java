@@ -2,11 +2,11 @@ package com.draiv.gugledraiv.dto;
 
 public class UserDTO {
 
-    private Long userId;
+    private String userId;
     private String token;
     private Integer expiresIn;
     
-    public UserDTO(Long userId, String token, Integer expiresIn) {
+    public UserDTO(String userId, String token, Integer expiresIn) {
         this.userId = userId;
         this.token = token;
         this.expiresIn = expiresIn;
@@ -28,11 +28,11 @@ public class UserDTO {
         this.expiresIn = expiresIn;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
     

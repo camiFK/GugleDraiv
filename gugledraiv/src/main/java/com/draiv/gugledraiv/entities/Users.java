@@ -13,9 +13,8 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Users {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userId")
-    private Long userId;
+    private String userId;
  
     @Column(name = "token", unique = true, nullable = false)
     private String token;
@@ -30,11 +29,11 @@ public class Users {
     public Users() {
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

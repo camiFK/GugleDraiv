@@ -66,7 +66,7 @@ public class File {
 
     //Relaacion con Users
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = false)
     private Users user;
 
     public File(){
