@@ -14,11 +14,11 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
     File findByFileHash(String fileHash); 
 
-    List<File> findByUser_UserId(Long userId);
+    List<File> findByUser_UserId(String userId);
 
-    File findByUser_UserIdAndId(Long userId, Long id);
+    File findByUser_UserIdAndId(String userId, Long id);
 
-    List<File> findByUser_UserIdAndFilePath(Long userId, String filePath);
+    List<File> findByUser_UserIdAndFilePath(String userId, String filePath);
 
     List<File> findBySystemId(String systemId);
 }
