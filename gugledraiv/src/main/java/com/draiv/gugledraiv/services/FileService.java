@@ -174,24 +174,24 @@ public class FileService {
             file.setContent(null);
         }
 
+        file = fileRepository.save(file);
+
+        //fileHash
+        String fileHash = null;
+        if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
+            fileHash = generateFileHash(file.getId().toString());
+            file.setFileHash(fileHash);
+        } else {
+            file.setFileHash(null);
+        }   
+        
         //fileUrl
         if (!file.getIsFolder() && fileRequest.getIsPublic()) {
-            String fileURL = generateFileURL(fileRequest);
+            String fileURL = generateFileURL(fileHash);
             file.setFileURL(fileURL);
         }else{
             file.setFileURL(null);
         }
-
-        file = fileRepository.save(file);
-
-        //fileHash
-        if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
-            String fileHash = generateFileHash(file.getId().toString());
-            file.setFileHash(fileHash);
-        } else {
-            file.setContent(null);
-            file.setFileHash(null);
-        }     
 
         file = fileRepository.save(file);
 
@@ -246,8 +246,8 @@ public class FileService {
         }
     }
 
-    private String generateFileURL(FileRequest file) {
-        return "http://localhost:8082/files/" + file.getFileName();
+    private String generateFileURL(String fileHash) {
+        return "http://localhost:8082/download/" + fileHash; //cambiar URL base https://poo-dev.unsada.edu.ar:8088
     }
 
     public boolean deleteFileOrFolder(Long fileId, String systemId) {
