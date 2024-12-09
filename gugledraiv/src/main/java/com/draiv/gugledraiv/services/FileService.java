@@ -268,4 +268,22 @@ public class FileService {
 
         return false;
     }
+
+    public List<FileDTO> getFilesInFolder(Long folderId){
+        File parentFolder = fileRepository.findById(folderId).orElseThrow(() -> new EntityNotFoundException("Carpeta no encontrada con id: " + folderId));
+        List<File> files = fileRepository.findByFolder(parentFolder);
+
+        return files.stream().map(file -> new FileDTO(
+                        file.getId(),
+                        file.getIsFolder(),
+                        file.getFilePath(),
+                        file.getFileExt(),
+                        file.getFileName(),
+                        file.getMimeType(),
+                        file.getContent(),
+                        file.getIsPublic(),
+                        file.getFileURL(),
+                        file.getFileHash()
+                )).collect(Collectors.toList());
+    }
 }

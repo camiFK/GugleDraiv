@@ -194,4 +194,10 @@ public class FileController {
                     "message", "Ocurrió un error al procesar la solicitud."));
         }
     }
+
+    @GetMapping("/files/folder/{folderId}")
+    public ResponseEntity<List<FileDTO>> getFilesInFolder(@PathVariable Long folderId) {
+        List<FileDTO> filesInFolder = fileService.getFilesInFolder(folderId);
+        return ResponseEntity.ok(filesInFolder);
+    }
 }
