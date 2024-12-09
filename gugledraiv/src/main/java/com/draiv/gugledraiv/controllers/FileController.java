@@ -195,6 +195,7 @@ public class FileController {
         }
     }
 
+    // Endpoint para buscar los archivos de una carpeta atraves de su ID
     @GetMapping("/files/folder/{folderId}")
     public ResponseEntity<List<FileDTO>> getFilesInFolder(@PathVariable Long folderId) {
         List<FileDTO> filesInFolder = fileService.getFilesInFolder(folderId);
