@@ -8,6 +8,7 @@ import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -114,9 +115,9 @@ public class FileController {
             Tika tika = new Tika();
             String mimeType = tika.detect(decodedFileContent);
 
-            /* if (mimeType == null || mimeType.isEmpty()) {
+            if (mimeType == null || mimeType.isEmpty()) {
                 mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE; 
-            } */
+            } 
 
             String fileName = file.getFileName();
 
@@ -127,7 +128,6 @@ public class FileController {
             return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(decodedFileContent.length)
-                // .contentType(MediaType.APPLICATION_OCTET_STREAM)  
                 .body(decodedFileContent); 
 
         } catch (Exception e) {
