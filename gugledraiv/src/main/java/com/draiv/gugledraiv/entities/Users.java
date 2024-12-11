@@ -16,7 +16,7 @@ public class Users {
     @Column(name = "userId")
     private String userId;
  
-    @Column(name = "token", unique = true, nullable = false)
+    @Column(name = "token")
     private String token;
 
     @Column(name = "expiresIn")

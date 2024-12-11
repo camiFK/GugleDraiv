@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/draiv")
+@CrossOrigin(origins = "*")
 public class UsersController {
 
     @Autowired
@@ -50,16 +51,16 @@ public class UsersController {
     } 
 
     @DeleteMapping("/users/logout")
-    public ResponseEntity<String> deleteUser(@RequestParam String token) {
+    public ResponseEntity<String> deleteUser(@RequestParam String userId) {
         try {
-        boolean isDeleted = userService.deleteUserByToken(token);
+            boolean isDeleted = userService.deleteUserToken(userId);
         if (isDeleted) {
-            return ResponseEntity.ok("Usuario eliminado exitosamente.");
+            return ResponseEntity.ok("El token del usuario se elimino correctamente.");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
         }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el usuario.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el token de usuario.");
         }
     }
 

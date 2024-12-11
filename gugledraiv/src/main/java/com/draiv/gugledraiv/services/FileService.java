@@ -44,9 +44,9 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    public List<FileDTO> getFiles(String token, String systemId, String path) {
+    public List<FileDTO> getFiles(String token, String systemId, String path, String userId) {
 
-        Users user = userRepository.findByToken(token);
+        Users user = userRepository.findByUserId(userId);
 
         if (user == null) {
             throw new NoSuchElementException("No se encontro el usuario");
@@ -75,9 +75,9 @@ public class FileService {
                 file.getFileHash())).collect(Collectors.toList());
     }
 
-    public FileDTO getFileById(Long fileId, String token) {
+    public FileDTO getFileById(Long fileId, String token, String userId) {
 
-        Users user = userRepository.findByToken(token);
+        Users user = userRepository.findByUserId(userId);
 
         if (user == null) {
             throw new NoSuchElementException("No se encontro el usuario");
@@ -126,7 +126,7 @@ public class FileService {
     }
 
     public FileResponse createFileOrFolder(FileRequest fileRequest) {
-        Users user = userRepository.findByToken(fileRequest.getToken());
+        Users user = userRepository.findByUserId(fileRequest.getUserId());
         if (user == null) {
             throw new IllegalArgumentException("Token inválido o usuario no encontrado.");
         }
@@ -173,8 +173,6 @@ public class FileService {
         } else {
             file.setContent(null);
         }
-
-        file = fileRepository.save(file);
 
         //fileHash
         String fileHash = null;
@@ -247,7 +245,7 @@ public class FileService {
     }
 
     private String generateFileURL(String fileHash) {
-        return "http://localhost:8082/download/" + fileHash; //cambiar URL base https://poo-dev.unsada.edu.ar:8088
+        return "http://localhost:8082/draiv/download/" + fileHash; //cambiar URL base https://poo-dev.unsada.edu.ar:8088
     }
 
     public boolean deleteFileOrFolder(Long fileId, String systemId) {

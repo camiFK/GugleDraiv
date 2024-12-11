@@ -3,6 +3,7 @@ package com.draiv.gugledraiv.dto;
 public class FileRequest {
 
     private String token;
+    private String userId;
     private String systemId;
     private Boolean isFolder;
     private String filePath;
@@ -13,6 +14,12 @@ public class FileRequest {
     private Boolean isPublic;
     private Long folderId;
     
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
     public Long getFolderId() {
         return folderId;
     }

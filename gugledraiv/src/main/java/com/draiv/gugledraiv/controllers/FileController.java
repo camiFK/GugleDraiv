@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,7 @@ import com.draiv.gugledraiv.services.FileService;
 import com.draiv.gugledraiv.services.UserService;
 
 @RestController
+@RequestMapping("/draiv")
 @CrossOrigin(origins = "*")
 public class FileController {
     @Autowired
@@ -43,7 +45,8 @@ public class FileController {
     public ResponseEntity<?> getFiles(
             @RequestParam String token,
             @RequestParam String systemId,
-            @RequestParam(required = false) String path) {
+            @RequestParam(required = false) String path,
+            @RequestParam String userId) {
         try {
             if (!userService.isAuthenticated(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
@@ -54,7 +57,7 @@ public class FileController {
                         .body("Token y systemId son parametros obligatorios.");
             }
 
-            List<FileDTO> files = fileService.getFiles(token, systemId, path);
+            List<FileDTO> files = fileService.getFiles(token, systemId, path, userId);
 
             return ResponseEntity.status(HttpStatus.OK).body(files);
 
@@ -69,7 +72,8 @@ public class FileController {
     public ResponseEntity<?> getFileById(
             @PathVariable Long fileId,
             @RequestParam String token,
-            @RequestParam String systemId) {
+            @RequestParam String systemId,
+            @RequestParam String userId) {
         try {
             if (!userService.isAuthenticated(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
@@ -79,7 +83,7 @@ public class FileController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token y systemId son obligatorios.");
             }
 
-            FileDTO fileDTO = fileService.getFileById(fileId, token);
+            FileDTO fileDTO = fileService.getFileById(fileId, token, userId);
 
             if (fileDTO == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe el archivo/carpeta indicado.");

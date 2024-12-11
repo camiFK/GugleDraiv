@@ -56,30 +56,16 @@ public class UserService {
         return false;
     }
 
-
-    /* 
-    public boolean isAuthenticated(String token) {
-        if (token == null || token.isEmpty()) {
-            return false;
-        }
-
-        if (userRepository.findByToken(token) == null) {
-            return false;
-        }
-        return true;
-    }
-    */ 
-
-    public boolean deleteUserByToken(String token) {
-        if (token == null || token.isEmpty()) {
-            throw new IllegalArgumentException("El token no puede ser nulo o vacío.");
-        }
-        token = token.trim();
-        Users user = userRepository.findByToken(token);
+    public boolean deleteUserToken(String userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Falta el parametro userId.");
+        }  
+        Users user = userRepository.findByUserId(userId);
         if (user == null) {
-            throw new IllegalStateException("El token no corresponde a ningún usuario.");
+            throw new IllegalStateException("No se encontro el usuario con el Id: " + userId);
         } else {
-            userRepository.delete(user);
+            user.setToken(null);
+            userRepository.save(user);
             return true;
         }
     }
