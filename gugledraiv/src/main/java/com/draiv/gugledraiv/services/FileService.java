@@ -174,6 +174,8 @@ public class FileService {
             file.setContent(null);
         }
 
+        file = fileRepository.save(file);
+
         //fileHash
         String fileHash = null;
         if (!fileRequest.getIsFolder() && fileRequest.getContent() != null) {
