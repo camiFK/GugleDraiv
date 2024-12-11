@@ -11,12 +11,13 @@ public class FileDTO {
     private Boolean isPublic;
     private String fileURL;
     private String fileHash;
+    private Long folderId;
 
     public FileDTO() {
         super();
     }
 
-    public FileDTO(Long id, Boolean isFolder, String filePath, String fileExt, String fileName, String mimeType, String content, Boolean isPublic, String fileURL, String fileHash) {
+    public FileDTO(Long id, Boolean isFolder, String filePath, String fileExt, String fileName, String mimeType, String content, Boolean isPublic, String fileURL, String fileHash, Long folderId) {
         this.id = id;
         this.isFolder = isFolder;
         this.filePath = filePath;
@@ -27,6 +28,7 @@ public class FileDTO {
         this.isPublic = isPublic;
         this.fileURL = fileURL;
         this.fileHash = fileHash;
+        this.folderId = folderId;
     }
 
     public String getFileHash() {
@@ -109,6 +111,13 @@ public class FileDTO {
         this.fileURL = fileURL;
     }
 
+    public Long getFolderId(){
+        return folderId;
+    }
+    public void setFolderId(Long folderId){
+        this.folderId = folderId;
+    }
+
     @Override
     public String toString() {
         return "FileDTO{" +
@@ -120,6 +129,7 @@ public class FileDTO {
                 ", mimeType='" + mimeType + '\'' +
                 ", isPublic=" + isPublic +
                 ", fileURL='" + fileURL + '\'' +
+                ", folderId='" + folderId + '\'' +
                 '}';
     }
 }

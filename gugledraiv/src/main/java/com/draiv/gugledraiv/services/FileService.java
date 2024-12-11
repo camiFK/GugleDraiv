@@ -62,17 +62,24 @@ public class FileService {
             files = fileRepository.findByUser_UserId(user.getUserId());
         }
 
-        return files.stream().map(file -> new FileDTO(
-                file.getId(),
-                file.getIsFolder(),
-                file.getFilePath(),
-                file.getFileExt(),
-                file.getFileName(),
-                file.getMimeType(),
-                file.getContent(),
-                file.getIsPublic(),
-                file.getFileURL(),
-                file.getFileHash())).collect(Collectors.toList());
+        return files.stream().map(file -> {
+            // Obtener id de la carpeta padre 
+            Long folderId = (file.getFolder() != null) ? file.getFolder().getId() : null;
+    
+            return new FileDTO(
+                    file.getId(),
+                    file.getIsFolder(),
+                    file.getFilePath(),
+                    file.getFileExt(),
+                    file.getFileName(),
+                    file.getMimeType(),
+                    file.getContent(),
+                    file.getIsPublic(),
+                    file.getFileURL(),
+                    file.getFileHash(),
+                    folderId
+            );
+        }).collect(Collectors.toList());
     }
 
     public FileDTO getFileById(Long fileId, String token, String userId) {
@@ -101,6 +108,10 @@ public class FileService {
         dto.setContent(file.getIsFolder() ? null : file.getContent());
         dto.setIsPublic(file.getIsPublic());
         dto.setFileURL(file.getIsPublic() ? file.getFileURL() : null);
+
+        Long folderId = (file.getFolder() != null) ? file.getFolder().getId() : null;
+        dto.setFolderId(folderId);
+        
         return dto;
     }
 
@@ -273,17 +284,23 @@ public class FileService {
         File parentFolder = fileRepository.findById(folderId).orElseThrow(() -> new EntityNotFoundException("Carpeta no encontrada con id: " + folderId));
         List<File> files = fileRepository.findByFolder(parentFolder);
 
-        return files.stream().map(file -> new FileDTO(
-                        file.getId(),
-                        file.getIsFolder(),
-                        file.getFilePath(),
-                        file.getFileExt(),
-                        file.getFileName(),
-                        file.getMimeType(),
-                        file.getContent(),
-                        file.getIsPublic(),
-                        file.getFileURL(),
-                        file.getFileHash()
-                )).collect(Collectors.toList());
+        return files.stream().map(file -> {
+            // Obtener id de la carpeta padre
+            Long fileFolderId = (file.getFolder() != null) ? file.getFolder().getId() : null;
+    
+            return new FileDTO(
+                    file.getId(),
+                    file.getIsFolder(),
+                    file.getFilePath(),
+                    file.getFileExt(),
+                    file.getFileName(),
+                    file.getMimeType(),
+                    file.getContent(),
+                    file.getIsPublic(),
+                    file.getFileURL(),
+                    file.getFileHash(),
+                    fileFolderId
+            );
+        }).collect(Collectors.toList());
     }
 }
