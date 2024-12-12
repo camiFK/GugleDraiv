@@ -1,14 +1,20 @@
 package com.draiv.gugledraiv.entities;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class File {
@@ -16,52 +22,68 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @Column(nullable = false)
-    private String token;
-
+    @Column (name = "systemId")
     private String systemId;
 
-    // @Column(nullable = false)
-    private Boolean isFolder;
+    @Column (name = "isFolder", nullable = false)
+    public Boolean isFolder;
 
-    // @Column(nullable = false)
+    @Column (name = "filePath", nullable = false)
     private String filePath;
 
-    // @Column(nullable = false)
+    @Column (name = "fileExt")
     private String fileExt;
 
-    // @Column(nullable = false)
+    @Column (name = "fileName", nullable = false)
     private String fileName;
 
-    // @Column(nullable = false)
+    @Column (name = "mimeType")
     private String mimeType;
 
-    // @Column(nullable = false)
+    @Lob
+    @Column (name = "content", columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(nullable = false)
-    private String name;
-
-    // @Column(nullable = false)
+    @Column(name = "fileHash")
     private String fileHash;
 
-    // @Column(nullable = false)
+    @Column (name = "uploadDate", nullable = false)
     private LocalDateTime uploadDate;
 
-    // @Column(nullable = false)
+    @Column (name = "isPublic", nullable = false)
     private Boolean isPublic;
 
-    // @Column(nullable = false)
+    @Column(name = "fileUrl")
     private String fileURL;
 
-    @ManyToOne
-    @JoinColumn(name = "folder_id")
-    private Folder folder;
+    //Relacion recursiva para carpetas
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "folderId")
+    private File folder;
 
-    public File() {
-        super();
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<File> children;
+
+    //Relaacion con Users
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = false)
+    private Users user;
+
+    public File(){
+        this.children = new ArrayList<>();
     }
 
+    public File getFolder(){
+        return folder;
+    }
+
+    public void setFolder(File folder){
+        this.folder = folder;
+        if(folder != null){
+            folder.getChildren().add(this);
+        }
+    }
+    
     public Long getId() {
         return id;
     }
@@ -70,12 +92,20 @@ public class File {
         this.id = id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getSystemId() {
+        return systemId;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
+    }
+
+    public Boolean getIsFolder() {
+        return isFolder;
+    }
+
+    public void setIsFolder(Boolean isFolder) {
+        this.isFolder = isFolder;
     }
 
     public String getFilePath() {
@@ -85,4 +115,86 @@ public class File {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public void setFileExt(String fileExt) {
+        this.fileExt = fileExt;
+    }
+    
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+    
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
+    }
+
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    public String getFileURL() {
+        return fileURL;
+    }
+
+    public void setFileURL(String fileURL) {
+        this.fileURL = fileURL;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+    
+    public List<File> getChildren() {
+        return children;
+    }
+    
+    public void setChildren(List<File> children) {
+        this.children = children;
+    }
+
+
 }
