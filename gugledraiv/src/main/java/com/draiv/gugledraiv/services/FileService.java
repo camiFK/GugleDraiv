@@ -117,7 +117,7 @@ public class FileService {
 
     public Resource getFileByHash(String fileHash) {
         try {
-            Path filePath = Paths.get("http://localhost:8082/files/", fileHash);
+            Path filePath = Paths.get("https://poo-dev.unsada.edu.ar:8082/draiv/files/", fileHash);
             Resource file = new UrlResource(filePath.toUri());
 
             if (Files.exists(filePath) && file.isReadable()) {
@@ -258,7 +258,7 @@ public class FileService {
     }
 
     private String generateFileURL(String fileHash) {
-        return "http://localhost:8082/draiv/download/" + fileHash; //cambiar URL base https://poo-dev.unsada.edu.ar:8088
+        return "https://poo-dev.unsada.edu.ar:8082/draiv/download/" + fileHash;
     }
 
     public boolean deleteFileOrFolder(Long fileId, String systemId) {
